@@ -94,6 +94,7 @@ namespace WowHeadParser
 
         public void StartParsing()
         {
+            setProgressBar(0);
             switch (comboBoxChoice.SelectedIndex)
             {
                 case 0:
