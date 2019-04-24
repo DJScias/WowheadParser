@@ -88,7 +88,7 @@ namespace WowHeadParser
             if (m_parsedEntitiesCount > m_entityTodoCount)
                 return;
 
-            Console.WriteLine("Nombre effectué : " + m_parsedEntitiesCount);
+            Console.WriteLine("Affected: " + m_parsedEntitiesCount);
 
             float percent = ((float)m_index / (float)m_entityTodoCount) * 100;
 

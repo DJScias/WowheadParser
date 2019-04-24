@@ -113,7 +113,7 @@ namespace WowHeadParser
             if (m_parsedEntitiesCount > m_array.Count)
                 return;
 
-            Console.WriteLine("Nombre effectué : " + m_parsedEntitiesCount);
+            Console.WriteLine("Affected: " + m_parsedEntitiesCount);
 
             float percent = ((float)m_index / (float)m_array.Count) * 100;
 

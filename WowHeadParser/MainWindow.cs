@@ -31,15 +31,15 @@ namespace WowHeadParser
             InitializeComponent();
 
             comboBoxChoice.Items.Add("Single");
-            comboBoxChoice.Items.Add("Zone");
             comboBoxChoice.Items.Add("Range");
+            comboBoxChoice.Items.Add("Zone");
 
+            comboBoxEntity.Items.Add("BlackMarket");
             comboBoxEntity.Items.Add("Creature");
             comboBoxEntity.Items.Add("Gameobject");
-            comboBoxEntity.Items.Add("Quest");
             comboBoxEntity.Items.Add("Item");
+            comboBoxEntity.Items.Add("Quest");
             comboBoxEntity.Items.Add("Zone");
-            comboBoxEntity.Items.Add("BlackMarket");
 
             comboBoxLocale.Items.Add("www");
             comboBoxLocale.Items.Add("fr");
@@ -116,18 +116,18 @@ namespace WowHeadParser
                 }
                 case 1:
                 {
-                    Zone zone = new Zone(this);
-                    zone.StartParsing(ids[currentId]);
-                    break;
-                }
-                case 2:
-                {
                     int firstId = Int32.Parse(textBoxFrom.Text);
                     int lastId = Int32.Parse(textBoxTo.Text);
 
                     Range range = new Range(this, m_fileName);
                     range.StartParsing(firstId, lastId);
 
+                    break;
+                }
+                case 2:
+                {
+                    Zone zone = new Zone(this);
+                    zone.StartParsing(ids[currentId]);
                     break;
                 }
             }
@@ -180,7 +180,7 @@ namespace WowHeadParser
 
         private void comboBoxChoice_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (comboBoxChoice.SelectedIndex < 2)
+            if (comboBoxChoice.SelectedIndex == 1)
                 HideToTextbox(true);
             else
                 HideToTextbox(false);
@@ -234,8 +234,16 @@ namespace WowHeadParser
 
             switch (comboBoxEntity.SelectedIndex)
             {
-                // Creature
+                // Black Market
                 case 0:
+                {
+                    leftDataGroup.Show();
+                    leftDataGroup.Text = "Data";
+                    leftListView.Items.Add("Debug");
+                    break;
+                }
+                // Creature
+                case 1:
                 {
                     HideDataGroups(false);
                     leftDataGroup.Text = "Data";
@@ -256,7 +264,7 @@ namespace WowHeadParser
                     break;
                 }
                 // Gameobject
-                case 1:
+                case 2:
                 {
                     leftDataGroup.Show();
                     leftDataGroup.Text = "Data";
@@ -266,8 +274,18 @@ namespace WowHeadParser
                     leftListView.Items.Add("mining");
                     break;
                 }
+                // Item
+                case 3:
+                {
+                    leftDataGroup.Show();
+                    leftDataGroup.Text = "Data";
+                    leftListView.Items.Add("create item");
+                    leftListView.Items.Add("dropped by");
+                    leftListView.Items.Add("loot");
+                    break;
+                }
                 // Quest
-                case 2:
+                case 4:
                 {
                     leftDataGroup.Show();
                     leftDataGroup.Text = "Data";
@@ -277,31 +295,12 @@ namespace WowHeadParser
                     leftListView.Items.Add("team");
                     break;
                 }
-                // Item
-                case 3:
-                {
-                    leftDataGroup.Show();
-                    leftDataGroup.Text = "Data";
-                    leftListView.Items.Add("create item");
-                    leftListView.Items.Add("export pvp");
-                    leftListView.Items.Add("dropped by");
-                    leftListView.Items.Add("loot");
-                    break;
-                }
                 // Zone
-                case 4:
-                {
-                    leftDataGroup.Show();
-                    leftDataGroup.Text = "Data";
-                    leftListView.Items.Add("Fishing");
-                    break;
-                }
-                // Marché Noir
                 case 5:
                 {
                     leftDataGroup.Show();
                     leftDataGroup.Text = "Data";
-                    leftListView.Items.Add("Debug");
+                    leftListView.Items.Add("Fishing");
                     break;
                 }
             }

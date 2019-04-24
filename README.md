@@ -7,7 +7,7 @@ Unchecked box means the option might be incomplete and/or broken. Eventually all
 - [ ] Black Market
 - [x] Creature
 - [x] Gameobject
-- [ ] Item
+- [x] Item
 - [ ] Quest
 - [ ] Zone
 

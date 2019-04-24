@@ -220,32 +220,6 @@ namespace WowHeadParser.Entities
                 returnSql += m_itemDroppedByBuilder.ToString() + "\n";
             }
 
-            if (IsCheckboxChecked("export pvp"))
-            {
-                if (m_data.level != 620 && m_data.level != 660 && // PVP
-                    m_data.level != 630 && m_data.level != 655)   // PVE
-                    return "";
-
-                if ((m_data.level == 620 || m_data.level == 630) && m_data.quality != 3)
-                    return "";
-
-                if ((m_data.level == 660 || m_data.level == 655) && m_data.quality != 4)
-                    return "";
-
-                if (m_data.classs != 2 && m_data.classs != 4)
-                    return "";
-
-                if ((m_data.level == 620 || m_data.level == 660) && m_data.namedesc == "Saison 1 de Warlords")
-                {
-                    returnSql += "INSERT INTO item_wod (id, ilevel, pvp, spec) VALUES (" + m_data.id + ", " + m_data.level + ", 1, '" + string.Join(" ", m_data.specs) + "');";
-                }
-
-                if ((m_data.level == 630 || m_data.level == 655) && m_data.namedesc != "Saison 1 de Warlords")
-                {
-                    returnSql += "INSERT INTO item_wod (id, ilevel, pvp, spec) VALUES (" + m_data.id + ", " + m_data.level + ", 0, '" + string.Join(" ", m_data.specs) + "');";
-                }
-            }
-
             return returnSql;
         }
 
