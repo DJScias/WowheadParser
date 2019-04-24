@@ -147,9 +147,9 @@
             // leftDataGroup
             // 
             this.leftDataGroup.Controls.Add(this.leftListView);
-            this.leftDataGroup.Location = new System.Drawing.Point(12, 77);
+            this.leftDataGroup.Location = new System.Drawing.Point(12, 36);
             this.leftDataGroup.Name = "leftDataGroup";
-            this.leftDataGroup.Size = new System.Drawing.Size(200, 166);
+            this.leftDataGroup.Size = new System.Drawing.Size(200, 177);
             this.leftDataGroup.TabIndex = 13;
             this.leftDataGroup.TabStop = false;
             this.leftDataGroup.Text = "leftDataGroup";
@@ -162,7 +162,7 @@
             this.leftListView.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.None;
             this.leftListView.Location = new System.Drawing.Point(6, 19);
             this.leftListView.Name = "leftListView";
-            this.leftListView.Size = new System.Drawing.Size(188, 141);
+            this.leftListView.Size = new System.Drawing.Size(188, 152);
             this.leftListView.TabIndex = 0;
             this.leftListView.UseCompatibleStateImageBehavior = false;
             this.leftListView.View = System.Windows.Forms.View.List;
@@ -170,9 +170,9 @@
             // rightDataGroup
             // 
             this.rightDataGroup.Controls.Add(this.rightListView);
-            this.rightDataGroup.Location = new System.Drawing.Point(247, 77);
+            this.rightDataGroup.Location = new System.Drawing.Point(247, 36);
             this.rightDataGroup.Name = "rightDataGroup";
-            this.rightDataGroup.Size = new System.Drawing.Size(200, 166);
+            this.rightDataGroup.Size = new System.Drawing.Size(200, 177);
             this.rightDataGroup.TabIndex = 14;
             this.rightDataGroup.TabStop = false;
             this.rightDataGroup.Text = "rightDataGroup";
@@ -184,7 +184,7 @@
             this.rightListView.CheckBoxes = true;
             this.rightListView.Location = new System.Drawing.Point(6, 19);
             this.rightListView.Name = "rightListView";
-            this.rightListView.Size = new System.Drawing.Size(188, 141);
+            this.rightListView.Size = new System.Drawing.Size(188, 152);
             this.rightListView.TabIndex = 1;
             this.rightListView.UseCompatibleStateImageBehavior = false;
             this.rightListView.View = System.Windows.Forms.View.List;
@@ -193,7 +193,7 @@
             // 
             this.progressBar1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.progressBar1.Location = new System.Drawing.Point(47, 42);
+            this.progressBar1.Location = new System.Drawing.Point(47, 219);
             this.progressBar1.Name = "progressBar1";
             this.progressBar1.Size = new System.Drawing.Size(400, 23);
             this.progressBar1.TabIndex = 1;
@@ -201,7 +201,7 @@
             // ProgressBarValue
             // 
             this.ProgressBarValue.AutoSize = true;
-            this.ProgressBarValue.Location = new System.Drawing.Point(9, 47);
+            this.ProgressBarValue.Location = new System.Drawing.Point(9, 224);
             this.ProgressBarValue.Name = "ProgressBarValue";
             this.ProgressBarValue.Size = new System.Drawing.Size(21, 13);
             this.ProgressBarValue.TabIndex = 8;
