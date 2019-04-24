@@ -60,6 +60,7 @@
             // 
             // comboBoxChoice
             // 
+            this.comboBoxChoice.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBoxChoice.FormattingEnabled = true;
             this.comboBoxChoice.Location = new System.Drawing.Point(12, 10);
             this.comboBoxChoice.Name = "comboBoxChoice";
@@ -105,6 +106,7 @@
             // 
             // comboBoxLocale
             // 
+            this.comboBoxLocale.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBoxLocale.FormattingEnabled = true;
             this.comboBoxLocale.Location = new System.Drawing.Point(12, 169);
             this.comboBoxLocale.Name = "comboBoxLocale";
@@ -131,6 +133,7 @@
             // 
             // comboBoxEntity
             // 
+            this.comboBoxEntity.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBoxEntity.FormattingEnabled = true;
             this.comboBoxEntity.Location = new System.Drawing.Point(118, 10);
             this.comboBoxEntity.Name = "comboBoxEntity";
