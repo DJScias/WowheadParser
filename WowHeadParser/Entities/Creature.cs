@@ -160,7 +160,7 @@ namespace WowHeadParser.Entities
             String creatureTrainerPattern = @"new Listview\(\{template: 'spell', id: 'teaches-recipe', name: LANG\.tab_teaches, tabs: tabsRelated, parent: 'lkljbjkb574', visibleCols: \['source'\], data: (.+)\}\);";
             String creatureQuestStarterPattern = @"new Listview\(\{template: 'quest', id: 'starts', name: LANG\.tab_starts, tabs: tabsRelated, parent: 'lkljbjkb574', data: (.+)\}\);";
             String creatureQuestEnderPattern = @"new Listview\(\{template: 'quest', id: 'ends', name: LANG\.tab_ends, tabs: tabsRelated, parent: 'lkljbjkb574', data: (.+)\}\);";
-            String creatureMoneyPattern = @"money\\x3D([0-9]+)\\x5D";
+            String creatureMoneyPattern = @"\[money=([0-9]+)\]";
 
             String creatureTemplateDataJSon = Tools.ExtractJsonFromWithPattern(creatureHtml, dataPattern);
             String creatureHealthDataJSon   = Tools.ExtractJsonFromWithPattern(creatureHtml, creatureHealthPattern);
@@ -400,9 +400,9 @@ namespace WowHeadParser.Entities
                 return 14;
 
             if (m_creatureTemplateData.react[(int)reactOrder.ALLIANCE] == "1" && m_creatureTemplateData.react[(int)reactOrder.HORDE] == "1")
-                return 35; // Ennemis
+                return 35; // Villain
             else if (m_creatureTemplateData.react[(int)reactOrder.ALLIANCE] == "1" && m_creatureTemplateData.react[(int)reactOrder.HORDE] == "-1")
-                return 11; // Hurlevent
+                return 11; // Stormwind
             else if (m_creatureTemplateData.react[(int)reactOrder.ALLIANCE] == "-1" && m_creatureTemplateData.react[(int)reactOrder.HORDE] == "1")
                 return 85; // Orgrimmar
             else if (m_creatureTemplateData.react[(int)reactOrder.ALLIANCE] == "0" && m_creatureTemplateData.react[(int)reactOrder.HORDE] == "0")
