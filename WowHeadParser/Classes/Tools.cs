@@ -195,9 +195,9 @@ namespace WowHeadParser
         public static String GetWowheadUrl(String type, String id)
         {
             if (type != "")
-                return "http://fr.wowhead.com/" + type + "=" + id;
+                return "http://www.wowhead.com/" + type + "=" + id;
             else
-                return "http://fr.wowhead.com/" + id;
+                return "http://www.wowhead.com/" + id;
         }
 
         public static String GetFileNameForCurrentTime()
