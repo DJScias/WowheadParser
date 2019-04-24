@@ -50,6 +50,10 @@ namespace WowHeadParser
 
             comboBoxChoice.SelectedIndex = 0;
 
+            comboBoxVersion.Items.Add("8.0.1.28153");
+            comboBoxVersion.Items.Add("7.3.5.26972");
+            comboBoxVersion.SelectedIndex = 0;
+
             HideToTextbox(true);
             HideDataGroups(true);
 
@@ -66,13 +70,15 @@ namespace WowHeadParser
 
         private void button1_Click(object sender, EventArgs e)
         {
-            String selectedText = comboBoxLocale.Items[comboBoxLocale.SelectedIndex].ToString();
-            Properties.Settings.Default.wowheadLocale = selectedText;
+            String selectedLocale = comboBoxLocale.Items[comboBoxLocale.SelectedIndex].ToString();
+            String selectedVersion = comboBoxVersion.Items[comboBoxVersion.SelectedIndex].ToString();
+            Properties.Settings.Default.wowheadLocale = selectedLocale;
             Properties.Settings.Default.selectedEntity = comboBoxEntity.SelectedIndex;
+            Properties.Settings.Default.version = selectedVersion;
             Entity.ReloadWowheadBaseUrl();
             UpdateCheckboxSettings(); // Must be done before Properties.Settings.Default.Save
 
-            switch (selectedText)
+            switch (selectedLocale)
             {
                 case "www": Properties.Settings.Default.localIndex = (int)LocaleConstant.enUS; break;
                 case "fr": Properties.Settings.Default.localIndex = (int)LocaleConstant.frFR; break;

@@ -421,18 +421,34 @@ namespace WowHeadParser.Entities
             // Creature Template
             if (IsCheckboxChecked("template"))
             {
-                m_creatureTemplateBuilder = new SqlBuilder("creature_template", "entry");
-                m_creatureTemplateBuilder.SetFieldsNames("minlevel", "maxlevel", "name", "subname", "rank", "type", "family");
+                switch (GetVersion())
+                {
+                    case "7.3.5.26972":
+                    {
+                        m_creatureTemplateBuilder = new SqlBuilder("creature_template", "entry");
+                        m_creatureTemplateBuilder.SetFieldsNames("minlevel", "maxlevel", "name", "subname", "modelid1", "rank", "type", "family");
 
-                m_creatureTemplateBuilder.AppendFieldsValue(m_creatureTemplateData.id, m_creatureTemplateData.minlevel, m_creatureTemplateData.maxlevel, m_creatureTemplateData.name, m_subname ?? "", m_isBoss ? "3" : "0", m_creatureTemplateData.type, m_creatureTemplateData.family);
-                returnSql += m_creatureTemplateBuilder.ToString() + "\n";
+                        m_creatureTemplateBuilder.AppendFieldsValue(m_creatureTemplateData.id, m_creatureTemplateData.minlevel, m_creatureTemplateData.maxlevel, m_creatureTemplateData.name, m_subname ?? "", m_modelid, m_isBoss ? "3" : "0", m_creatureTemplateData.type, m_creatureTemplateData.family);
+                        returnSql += m_creatureTemplateBuilder.ToString() + "\n";
+                    }
+                    break;
+                    default: // 8.0.1.28153
+                    {
+                        m_creatureTemplateBuilder = new SqlBuilder("creature_template", "entry");
+                        m_creatureTemplateBuilder.SetFieldsNames("minlevel", "maxlevel", "name", "subname", "rank", "type", "family");
 
-                // models are now saved in creature_template_model as of BFA
-                m_creatureTemplateModelBuilder = new SqlBuilder("creature_template_model", "CreatureID");
-                m_creatureTemplateModelBuilder.SetFieldsNames("Idx", "CreatureDisplayID", "Probability");
+                        m_creatureTemplateBuilder.AppendFieldsValue(m_creatureTemplateData.id, m_creatureTemplateData.minlevel, m_creatureTemplateData.maxlevel, m_creatureTemplateData.name, m_subname ?? "", m_isBoss ? "3" : "0", m_creatureTemplateData.type, m_creatureTemplateData.family);
+                        returnSql += m_creatureTemplateBuilder.ToString() + "\n";
 
-                m_creatureTemplateModelBuilder.AppendFieldsValue(m_creatureTemplateData.id, "0", m_modelid, "1");
-                returnSql += m_creatureTemplateModelBuilder.ToString() + "\n";
+                        // models are now saved in creature_template_model as of BFA
+                        m_creatureTemplateModelBuilder = new SqlBuilder("creature_template_model", "CreatureID");
+                        m_creatureTemplateModelBuilder.SetFieldsNames("Idx", "CreatureDisplayID", "Probability");
+
+                        m_creatureTemplateModelBuilder.AppendFieldsValue(m_creatureTemplateData.id, "0", m_modelid, "1");
+                        returnSql += m_creatureTemplateModelBuilder.ToString() + "\n";
+                    }
+                    break;
+                }
             }
 
             if (IsCheckboxChecked("health modifier") && m_creatureTemplateData.health != null)

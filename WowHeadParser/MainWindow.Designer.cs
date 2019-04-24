@@ -44,6 +44,7 @@
             this.rightListView = new System.Windows.Forms.ListView();
             this.progressBar1 = new System.Windows.Forms.ProgressBar();
             this.ProgressBarValue = new System.Windows.Forms.Label();
+            this.comboBoxVersion = new System.Windows.Forms.ComboBox();
             this.leftDataGroup.SuspendLayout();
             this.rightDataGroup.SuspendLayout();
             this.SuspendLayout();
@@ -99,7 +100,7 @@
             // button1
             // 
             this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.button1.Location = new System.Drawing.Point(372, 248);
+            this.button1.Location = new System.Drawing.Point(372, 247);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(75, 23);
             this.button1.TabIndex = 7;
@@ -111,7 +112,7 @@
             // 
             this.comboBoxLocale.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBoxLocale.FormattingEnabled = true;
-            this.comboBoxLocale.Location = new System.Drawing.Point(12, 249);
+            this.comboBoxLocale.Location = new System.Drawing.Point(12, 248);
             this.comboBoxLocale.Name = "comboBoxLocale";
             this.comboBoxLocale.Size = new System.Drawing.Size(80, 21);
             this.comboBoxLocale.TabIndex = 6;
@@ -119,7 +120,7 @@
             // timeLeftLabel
             // 
             this.timeLeftLabel.AutoSize = true;
-            this.timeLeftLabel.Location = new System.Drawing.Point(185, 253);
+            this.timeLeftLabel.Location = new System.Drawing.Point(305, 252);
             this.timeLeftLabel.Name = "timeLeftLabel";
             this.timeLeftLabel.Size = new System.Drawing.Size(62, 13);
             this.timeLeftLabel.TabIndex = 9;
@@ -138,7 +139,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(99, 253);
+            this.label1.Location = new System.Drawing.Point(219, 252);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(81, 13);
             this.label1.TabIndex = 12;
@@ -201,17 +202,27 @@
             // ProgressBarValue
             // 
             this.ProgressBarValue.AutoSize = true;
-            this.ProgressBarValue.Location = new System.Drawing.Point(9, 224);
+            this.ProgressBarValue.Location = new System.Drawing.Point(20, 224);
             this.ProgressBarValue.Name = "ProgressBarValue";
             this.ProgressBarValue.Size = new System.Drawing.Size(21, 13);
             this.ProgressBarValue.TabIndex = 8;
             this.ProgressBarValue.Text = "0%";
+            // 
+            // comboBoxVersion
+            // 
+            this.comboBoxVersion.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBoxVersion.FormattingEnabled = true;
+            this.comboBoxVersion.Location = new System.Drawing.Point(100, 248);
+            this.comboBoxVersion.Name = "comboBoxVersion";
+            this.comboBoxVersion.Size = new System.Drawing.Size(82, 21);
+            this.comboBoxVersion.TabIndex = 15;
             // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(465, 277);
+            this.Controls.Add(this.comboBoxVersion);
             this.Controls.Add(this.rightDataGroup);
             this.Controls.Add(this.leftDataGroup);
             this.Controls.Add(this.label1);
@@ -254,6 +265,7 @@
         private System.Windows.Forms.ListView rightListView;
         private System.Windows.Forms.ProgressBar progressBar1;
         private System.Windows.Forms.Label ProgressBarValue;
+        private System.Windows.Forms.ComboBox comboBoxVersion;
     }
 }
 

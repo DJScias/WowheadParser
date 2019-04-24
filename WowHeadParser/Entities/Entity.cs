@@ -35,6 +35,8 @@ namespace WowHeadParser.Entities
 
         public virtual String GetWowheadUrl() { return ""; }
 
+        public virtual String GetVersion() { return Properties.Settings.Default.version; }
+
         public virtual List<Entity> GetIdsFromZone(String zoneId, String zoneHtml) { return new List<Entity>(); }
 
         public virtual bool ParseSingleJson(int id = 0) { return false; }

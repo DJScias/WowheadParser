@@ -3,7 +3,7 @@
   <Profiles />
   <Settings>
     <Setting Name="wowheadLocale" Type="System.String" Scope="User">
-      <Value Profile="(Default)">fr</Value>
+      <Value Profile="(Default)">www</Value>
     </Setting>
     <Setting Name="localIndex" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">2</Value>
@@ -13,6 +13,9 @@
     </Setting>
     <Setting Name="selectedEntity" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">0</Value>
+    </Setting>
+    <Setting Name="version" Type="System.String" Scope="User">
+      <Value Profile="(Default)">8.0.1.28153</Value>
     </Setting>
   </Settings>
 </SettingsFile>
