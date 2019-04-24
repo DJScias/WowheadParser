@@ -1,1 +1,1 @@
-# WowpacketParser for AshamaneProject
+# WowheadParser for TrinityCore
