@@ -202,7 +202,7 @@ namespace WowHeadParser
 
         public static String GetFileNameForCurrentTime()
         {
-            return DateTime.Now.ToString("yyyy-MM-dd_hh-mm-ss") + ".sql";
+            return DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss") + ".sql";
         }
 
         public static List<String> ExtractListJsonFromWithPattern(String input, String pattern)
