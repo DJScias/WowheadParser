@@ -5,8 +5,8 @@ Extracts, parses and outputs SQL information from Wowhead by a single ID, range 
 Unchecked box means the option might be incomplete and/or broken. Eventually all the options below will be checked.
 
 - [ ] Black Market
-- [x] Creatures
-- [ ] Gameobjects
+- [x] Creature
+- [ ] Gameobject
 - [ ] Item
 - [ ] Quest
 - [ ] Zone
