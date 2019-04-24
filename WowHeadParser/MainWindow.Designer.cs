@@ -56,7 +56,7 @@
             this.textBoxTo.Name = "textBoxTo";
             this.textBoxTo.Size = new System.Drawing.Size(80, 20);
             this.textBoxTo.TabIndex = 4;
-            this.textBoxTo.Text = "0";
+            this.textBoxTo.Text = "2";
             // 
             // comboBoxChoice
             // 
@@ -202,8 +202,9 @@
             // ProgressBarValue
             // 
             this.ProgressBarValue.AutoSize = true;
-            this.ProgressBarValue.Location = new System.Drawing.Point(20, 224);
+            this.ProgressBarValue.Location = new System.Drawing.Point(12, 224);
             this.ProgressBarValue.Name = "ProgressBarValue";
+            this.ProgressBarValue.RightToLeft = System.Windows.Forms.RightToLeft.No;
             this.ProgressBarValue.Size = new System.Drawing.Size(21, 13);
             this.ProgressBarValue.TabIndex = 8;
             this.ProgressBarValue.Text = "0%";

@@ -3,6 +3,7 @@
  */
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Windows.Forms;
 using WowHeadParser.Entities;
 
@@ -169,6 +170,11 @@ namespace WowHeadParser
                 timeLeftLabel.Text = "Finished";
                 SetStartButtonEnableState(true);
                 currentId = 0;
+                if (m_zeroPercentLootChance)
+                {
+                    m_zeroPercentLootChance = false;
+                    ShowZeroPercentPopup();
+                }               
             }
         }
 
@@ -208,6 +214,18 @@ namespace WowHeadParser
             }
         }
 
+        private bool hasHealthFiles()
+        {
+            string path = "Ressources";
+            DirectoryInfo dir = new DirectoryInfo(path);
+
+            var files = dir.GetFiles("NPCTotalHP*.txt");
+            if (files.Length < 7) // Legion/BFA = 7 files
+                return false;
+
+            return true;
+        }
+
         private void comboBoxEntity_SelectedIndexChanged(object sender, EventArgs e)
         {
             leftListView.Clear();
@@ -221,7 +239,8 @@ namespace WowHeadParser
                 {
                     HideDataGroups(false);
                     leftDataGroup.Text = "Data";
-                    leftListView.Items.Add("health modifier");
+                    if (hasHealthFiles()) // hide if files not present
+                        leftListView.Items.Add("health modifier");
                     leftListView.Items.Add("is dungeon/raid boss");
                     leftListView.Items.Add("locale");
                     leftListView.Items.Add("money");
@@ -319,6 +338,16 @@ namespace WowHeadParser
             return null;
         }
 
+        public void ShowZeroPercentPopup()
+        {
+            string message = "Wowhead does not have a drop percentage for one or more items dropped by this creature.\r\n\r\nPlease fill the chance in manually as it was set to 0.";
+            string caption = "Creature Loot - Warning!";
+            MessageBoxButtons buttons = MessageBoxButtons.OK;
+            MessageBoxIcon icon = MessageBoxIcon.Warning;
+            MessageBox.Show(message, caption, buttons, icon);
+        }
+
+        public static bool m_zeroPercentLootChance;
         private int currentId;
         private List<String> ids;
         private String m_fileName;

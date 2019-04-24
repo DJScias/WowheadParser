@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 using static WowHeadParser.MainWindow;
+using System.Windows.Forms;
 
 namespace WowHeadParser.Entities
 {
@@ -153,7 +154,7 @@ namespace WowHeadParser.Entities
             String dataPattern = @"\$\.extend\(g_npcs\[" + m_creatureTemplateData.id + @"\], (.+)\);";
             String modelPattern = @"ModelViewer\.show\(\{type: [0-9]+, typeId: " + m_creatureTemplateData.id + @", displayId: ([0-9]+)";
             String vendorPattern = @"new Listview\({template: 'item', id: 'sells', .+?, data: (.+)}\);";
-            String creatureHealthPattern = @"<div>(?:Health|Vie) : ((?:\d|,|\.)+)</div>";
+            String creatureHealthPattern = @"<div>(?:Health|Vie): ((?:\d|,|\.)+)</div>";
             String creatureLootPattern = @"new Listview\({template: 'item', id: 'drops', name: LANG\.tab_drops, tabs: tabsRelated, parent: 'lkljbjkb574', extraCols: \[Listview\.extraCols\.count, Listview\.extraCols\.percent(?:, Listview.extraCols.mode)?\],  showLootSpecs: [0-9],sort:\['-percent', 'name'\], _totalCount: [0-9]+, computeDataFunc: Listview\.funcBox\.initLootTable, onAfterCreate: Listview\.funcBox\.addModeIndicator, data: (.+)}\);";
             String creatureCurrencyPattern = @"new Listview\({template: 'currency', id: 'drop-currency', name: LANG\.tab_currencies, tabs: tabsRelated, parent: 'lkljbjkb574', extraCols: \[Listview\.extraCols\.count, Listview\.extraCols\.percent\], sort:\['-percent', 'name'], _totalCount: [0-9]*, computeDataFunc: Listview\.funcBox\.initLootTable, onAfterCreate: Listview\.funcBox\.addModeIndicator, data: (.+)}\);";
             String creatureSkinningPattern = @"new Listview\(\{template: 'item', id: 'skinning', name: LANG\.tab_skinning, tabs: tabsRelated, parent: 'lkljbjkb574', extraCols: \[Listview\.extraCols\.count, Listview\.extraCols\.percent\], sort:\['-percent', 'name'\], computeDataFunc: Listview\.funcBox\.initLootTable, note: WH\.sprintf\(LANG\.lvnote_npcskinning, [0-9]+\), _totalCount: ([0-9]+), data: (.+)}\);";
@@ -334,8 +335,10 @@ namespace WowHeadParser.Entities
                     else
                         percent = count * 100 / outof;
 
+                    /* Zero percentage items should be handled with a warning, hence commented out
                     if (count < 25 && percent < 0.05f)
                         continue;
+                    */
 
                     currentMode = realItemMode;
                 }
@@ -345,12 +348,17 @@ namespace WowHeadParser.Entities
                     {
                         try
                         {
-                            count = (float)Convert.ToDouble(allLootData[i].modes[mode]["count"]);
+                            count = (float)Convert.ToDouble(allLootData[i].modes[mode]["count"]) != -1 ? (float)Convert.ToDouble(allLootData[i].modes[mode]["count"]) : 0.0f;
                             outof = (float)Convert.ToDouble(allLootData[i].modes[mode]["outof"]);
-                            percent = count * 100 / outof;
+                            if (count != 0.0f)
+                                percent = count * 100 / outof;
+                            else
+                                percent = 0.0f;
 
+                            /* Zero percentage items should be handled with a warning, hence commented out
                             if (count < 25 && percent < 0.05f)
                                 continue;
+                            */
 
                             currentMode = mode;
                             break;
@@ -609,6 +617,9 @@ namespace WowHeadParser.Entities
                                                                          maxLootCount, // MaxCount
                                                                          ""); // Comment
                     }
+
+                    if (creatureLootData.percent == "0")
+                        m_zeroPercentLootChance = true;                   
                 }
 
                 returnSql += m_creatureLootBuilder.ToString() + "\n";
