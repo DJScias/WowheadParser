@@ -51,6 +51,7 @@ namespace WowHeadParser
             comboBoxChoice.SelectedIndex = 0;
 
             HideToTextbox(true);
+            HideDataGroups(true);
 
             ids = new List<String>();
             currentId = 0;
@@ -73,14 +74,14 @@ namespace WowHeadParser
 
             switch (selectedText)
             {
-                case "www": Properties.Settings.Default.localIndex = (int)LocaleConstant.enUS;  break;
-                case "fr":  Properties.Settings.Default.localIndex = (int)LocaleConstant.frFR;  break;
-                case "es":  Properties.Settings.Default.localIndex = (int)LocaleConstant.esES;  break;
-                case "de":  Properties.Settings.Default.localIndex = (int)LocaleConstant.deDE;  break;
-                case "it":  Properties.Settings.Default.localIndex = (int)LocaleConstant.itIT;  break;
-                case "pt":  Properties.Settings.Default.localIndex = (int)LocaleConstant.ptPT;  break;
-                case "ru":  Properties.Settings.Default.localIndex = (int)LocaleConstant.ruRU;  break;
-                default:    Properties.Settings.Default.localIndex = (int)LocaleConstant.frFR;  break;
+                case "www": Properties.Settings.Default.localIndex = (int)LocaleConstant.enUS; break;
+                case "fr": Properties.Settings.Default.localIndex = (int)LocaleConstant.frFR; break;
+                case "es": Properties.Settings.Default.localIndex = (int)LocaleConstant.esES; break;
+                case "de": Properties.Settings.Default.localIndex = (int)LocaleConstant.deDE; break;
+                case "it": Properties.Settings.Default.localIndex = (int)LocaleConstant.itIT; break;
+                case "pt": Properties.Settings.Default.localIndex = (int)LocaleConstant.ptPT; break;
+                case "ru": Properties.Settings.Default.localIndex = (int)LocaleConstant.ruRU; break;
+                default: Properties.Settings.Default.localIndex = (int)LocaleConstant.frFR; break;
             }
 
             Properties.Settings.Default.Save();
@@ -187,66 +188,95 @@ namespace WowHeadParser
             }
         }
 
+        private void HideDataGroups(bool hide)
+        {
+            if (hide)
+            {
+                leftDataGroup.Hide();
+                rightDataGroup.Hide();
+            }
+            else
+            {
+                leftDataGroup.Show();
+                rightDataGroup.Show();
+            }
+        }
+
         private void comboBoxEntity_SelectedIndexChanged(object sender, EventArgs e)
         {
-            selectList.Clear();
+            leftListView.Clear();
+            rightListView.Clear();
+            HideDataGroups(true);
 
             switch (comboBoxEntity.SelectedIndex)
             {
                 // Creature
                 case 0:
                 {
-                    selectList.Items.Add("Is Dungeon/Raid Boss");
-                    selectList.Items.Add("template");
-                    selectList.Items.Add("health modifier");
-                    selectList.Items.Add("locale");
-                    selectList.Items.Add("vendor");
-                    selectList.Items.Add("loot");
-                    selectList.Items.Add("skinning");
-                    selectList.Items.Add("trainer");
-                    selectList.Items.Add("quest starter");
-                    selectList.Items.Add("quest ender");
-                    selectList.Items.Add("simple faction");
-                    selectList.Items.Add("money");
+                    HideDataGroups(false);
+                    leftDataGroup.Text = "Data";
+                    leftListView.Items.Add("health modifier");
+                    leftListView.Items.Add("is dungeon/raid boss");
+                    leftListView.Items.Add("locale");
+                    leftListView.Items.Add("money");
+                    leftListView.Items.Add("simple faction");
+                    leftListView.Items.Add("template");
+                    rightDataGroup.Text = "Extra";
+                    rightListView.Items.Add("loot");
+                    rightListView.Items.Add("quest starter");
+                    rightListView.Items.Add("quest ender");
+                    rightListView.Items.Add("skinning");
+                    rightListView.Items.Add("trainer");
+                    rightListView.Items.Add("vendor");
                     break;
                 }
                 // Gameobject
                 case 1:
                 {
-                    selectList.Items.Add("locale");
-                    selectList.Items.Add("loot");
-                    selectList.Items.Add("herbalism");
-                    selectList.Items.Add("mining");
+                    leftDataGroup.Show();
+                    leftDataGroup.Text = "Data";
+                    leftListView.Items.Add("herbalism");
+                    leftListView.Items.Add("locale");
+                    leftListView.Items.Add("loot");
+                    leftListView.Items.Add("mining");
                     break;
                 }
                 // Quest
                 case 2:
                 {
-                    selectList.Items.Add("starter/ender");
-                    selectList.Items.Add("serie");
-                    selectList.Items.Add("team");
-                    selectList.Items.Add("class");
+                    leftDataGroup.Show();
+                    leftDataGroup.Text = "Data";
+                    leftListView.Items.Add("class");
+                    leftListView.Items.Add("serie");
+                    leftListView.Items.Add("starter/ender");
+                    leftListView.Items.Add("team");
                     break;
                 }
                 // Item
                 case 3:
                 {
-                    selectList.Items.Add("create item");
-                    selectList.Items.Add("loot");
-                    selectList.Items.Add("dropped by");
-                    selectList.Items.Add("export pvp");
+                    leftDataGroup.Show();
+                    leftDataGroup.Text = "Data";
+                    leftListView.Items.Add("create item");
+                    leftListView.Items.Add("export pvp");
+                    leftListView.Items.Add("dropped by");
+                    leftListView.Items.Add("loot");
                     break;
                 }
                 // Zone
                 case 4:
                 {
-                    selectList.Items.Add("Fishing");
+                    leftDataGroup.Show();
+                    leftDataGroup.Text = "Data";
+                    leftListView.Items.Add("Fishing");
                     break;
                 }
                 // Marché Noir
                 case 5:
                 {
-                    selectList.Items.Add("Débug");
+                    leftDataGroup.Show();
+                    leftDataGroup.Text = "Data";
+                    leftListView.Items.Add("Debug");
                     break;
                 }
             }
@@ -259,9 +289,13 @@ namespace WowHeadParser
             else
                 Properties.Settings.Default.checkedList.Clear();
 
-            for (int i = 0; i < selectList.Items.Count; ++i)
-                if (selectList.Items[i].Checked)
-                    Properties.Settings.Default.checkedList.Add(selectList.Items[i].Text);
+            for (int i = 0; i < leftListView.Items.Count; ++i)
+                if (leftListView.Items[i].Checked)
+                    Properties.Settings.Default.checkedList.Add(leftListView.Items[i].Text);
+
+            for (int i = 0; i < rightListView.Items.Count; ++i)
+                if (rightListView.Items[i].Checked)
+                    Properties.Settings.Default.checkedList.Add(rightListView.Items[i].Text);
         }
 
         public Entity CreateNeededEntity(int id = 0)

@@ -537,7 +537,7 @@ namespace WowHeadParser.Entities
                     int maxLootCount = creatureLootData.stack.Length >= 2 ? creatureLootData.stack[1] : minLootCount;
 
                     // If bonuses, certainly an important loot, set to references
-                    if (!IsCheckboxChecked("Is Dungeon/Raid Boss") || (creatureLootItemData == null || creatureLootItemData.bonustrees == null))
+                    if (!IsCheckboxChecked("is dungeon/raid boss") || (creatureLootItemData == null || creatureLootItemData.bonustrees == null))
                     {
                         switch (creatureLootData.mode)
                         {
