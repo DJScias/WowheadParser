@@ -85,7 +85,7 @@ namespace WowHeadParser
 
             Properties.Settings.Default.Save();
 
-            ids = new List<String>(textBoxDe.Text.Split(' '));
+            ids = new List<String>(textBoxFrom.Text.Split(' '));
             m_fileName = Tools.GetFileNameForCurrentTime();
             StartParsing();
 
@@ -114,8 +114,8 @@ namespace WowHeadParser
                 }
                 case 2:
                 {
-                    int firstId = Int32.Parse(textBoxDe.Text);
-                    int lastId = Int32.Parse(textBoxA.Text);
+                    int firstId = Int32.Parse(textBoxFrom.Text);
+                    int lastId = Int32.Parse(textBoxTo.Text);
 
                     Range range = new Range(this, m_fileName);
                     range.StartParsing(firstId, lastId);
@@ -154,12 +154,12 @@ namespace WowHeadParser
                 StartParsing();
 
                 setProgressBar(100);
-                timeLeftLabel.Text = "Terminé (" + (currentId + 1) + "/" + ids.Count + ")";
+                timeLeftLabel.Text = "Finished (" + (currentId + 1) + "/" + ids.Count + ")";
             }
             else
             {
                 setProgressBar(100);
-                timeLeftLabel.Text = "Terminé";
+                timeLeftLabel.Text = "Finished";
                 SetStartButtonEnableState(true);
                 currentId = 0;
             }
@@ -177,13 +177,13 @@ namespace WowHeadParser
         {
             if (hide)
             {
-                textBoxA.Hide();
-                labelA.Hide();
+                textBoxTo.Hide();
+                labelTo.Hide();
             }
             else
             {
-                textBoxA.Show();
-                labelA.Show();
+                textBoxTo.Show();
+                labelTo.Show();
             }
         }
 
