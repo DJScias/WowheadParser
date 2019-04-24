@@ -125,38 +125,25 @@ namespace WowHeadParser.Entities
             Array.Copy(gameobjectLootItemDatas, gameobjectLootDatas, gameobjectLootItemDatas.Length);
             Array.Copy(gameobjectLootCurrencyDatas, 0, gameobjectLootDatas, gameobjectLootItemDatas.Length, gameobjectLootCurrencyDatas.Length);
 
+            List<String> modes = new List<String>() { "1", "2", "4", "33554432" };
+
             for (uint i = 0; i < gameobjectLootDatas.Length; ++i)
             {
                 float count = 0.0f;
                 float outof = 0.0f;
                 float percent = 0.0f;
 
-                try
-                {
-                    count = (float)Convert.ToDouble(gameobjectLootDatas[i].modes["4"]["count"]);
-                    outof = (float)Convert.ToDouble(gameobjectLootDatas[i].modes["4"]["outof"]);
-                    percent = count * 100 / outof;
-                }
-                catch (Exception)
+                foreach (String mode in modes)
                 {
                     try
                     {
-                        count = (float)Convert.ToDouble(gameobjectLootDatas[i].modes["2"]["count"]);
-                        outof = (float)Convert.ToDouble(gameobjectLootDatas[i].modes["2"]["outof"]);
+                        count = (float)Convert.ToDouble(gameobjectLootDatas[i].modes[mode]["count"]);
+                        outof = (float)Convert.ToDouble(gameobjectLootDatas[i].modes[mode]["outof"]);
                         percent = count * 100 / outof;
                     }
-                    catch (Exception)
+                    catch (Exception e)
                     {
-                        try
-                        {
-                            count = (float)Convert.ToDouble(gameobjectLootDatas[i].modes["33554432"]["count"]);
-                            outof = (float)Convert.ToDouble(gameobjectLootDatas[i].modes["33554432"]["outof"]);
-                            percent = count * 100 / outof;
-                        }
-                        catch (Exception e)
-                        {
-                            Console.WriteLine(e.Message);
-                        }
+                        Console.WriteLine(e.Message);
                     }
                 }
 
