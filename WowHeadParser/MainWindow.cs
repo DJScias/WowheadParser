@@ -326,12 +326,12 @@ namespace WowHeadParser
         {
             switch (Properties.Settings.Default.selectedEntity)
             {
-                case 0: return new Creature(id);
-                case 1: return new Gameobject(id);
-                case 2: return new Quest(id);
+                case 0: return new BlackMarket(id);
+                case 1: return new Creature(id);
+                case 2: return new Gameobject(id);
                 case 3: return new Item(id);
-                case 4: return new ZoneEntity(id);
-                case 5: return new BlackMarket(id);
+                case 4: return new Quest(id);
+                case 5: return new ZoneEntity(id);
             }
 
             return null;

@@ -113,19 +113,44 @@ namespace WowHeadParser.Entities
 
         public void SetData(dynamic questData)
         {
+            // Save starter and ender IDs to avoid duplicates that Wowhead sometimes has
+            List<int> starterIDs = new List<int>();
+            List<int> enderIDs = new List<int>();
+
             foreach (dynamic objective in questData.objectives)
             {
-                foreach (dynamic zone in objective)
+                foreach (dynamic zoneid in objective)
                 {
-                    foreach (dynamic test1 in zone.levels)
+                    foreach (dynamic levels in zoneid.levels)
                     {
-                        foreach (dynamic objectiveData in test1)
+                        dynamic objectiveData = levels.First;
+                        if (objectiveData is Newtonsoft.Json.Linq.JArray)
                         {
-                            if (objectiveData.point == "start")
-                                m_builderStarter.AppendFieldsValue(objectiveData.id, m_data.id);
+                            for (int i = 0; i < objectiveData.Count; i++)
+                            {
+                                int npcID = objectiveData[i]["id"].ToObject<int>();
+                                Console.WriteLine(npcID.GetType());
 
-                            if (objectiveData.point == "end")
-                                m_builderEnder.AppendFieldsValue(objectiveData.id, m_data.id);
+                                if (objectiveData[i]["point"] == "start" && !starterIDs.Contains(npcID))
+                                {
+                                    m_builderStarter.AppendFieldsValue(objectiveData[i]["id"], m_data.id);
+                                    starterIDs.Add(npcID);
+                                }
+
+                                if (objectiveData[i]["point"] == "end" && !enderIDs.Contains(npcID))
+                                {
+                                    m_builderEnder.AppendFieldsValue(objectiveData[i]["id"], m_data.id);
+                                    enderIDs.Add(npcID);
+                                }
+                            }
+
+                        } else
+                        {
+                            if (objectiveData["point"] == "start")
+                                m_builderStarter.AppendFieldsValue(objectiveData["id"], m_data.id);
+
+                            if (objectiveData["point"] == "end")
+                                m_builderEnder.AppendFieldsValue(objectiveData["id"], m_data.id);
                         }
                     }
                 }
