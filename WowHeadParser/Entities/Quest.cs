@@ -85,9 +85,11 @@ namespace WowHeadParser.Entities
 
             String dataPattern = @"var myMapper = new Mapper\((.+)\)";
             String seriePattern = "(<table class=\"series\">.+?</table>)";
+            String classLinePattern = @"\[li\]Classes: (.+)\[\\/li\]\[li\]\[icon name=quest_start\]";
 
             String questDataJSon = Tools.ExtractJsonFromWithPattern(questHtml, dataPattern);
             String questSerieXml = Tools.ExtractJsonFromWithPattern(questHtml, seriePattern);
+            String questClassLineJSon = Tools.ExtractJsonFromWithPattern(questHtml, classLinePattern);
 
             bool isAlliance = questHtml.Contains(@"Faction\x20\x3A\x20\x5Bspan\x20class\x3Dicon\x2Dalliance\x5DAlliance");
             bool isHorde    = questHtml.Contains(@"Faction\x20\x3A\x20\x5Bspan\x20class\x3Dicon\x2Dhorde\x5DHorde");
@@ -105,7 +107,8 @@ namespace WowHeadParser.Entities
 
             SetTeam(isAlliance, isHorde);
 
-            List<String> questClass = Tools.ExtractListJsonFromWithPattern(questHtml, @"\[class=(\d+)\]");
+
+            List<String> questClass = Tools.ExtractListJsonFromWithPattern(questClassLineJSon, @"\[class=(\d+)\]");
             SetClassRequired(questClass);
 
             return true;
