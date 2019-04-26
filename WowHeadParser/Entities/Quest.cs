@@ -129,7 +129,6 @@ namespace WowHeadParser.Entities
                             for (int i = 0; i < objectiveData.Count; i++)
                             {
                                 int npcID = objectiveData[i]["id"].ToObject<int>();
-                                Console.WriteLine(npcID.GetType());
 
                                 if (objectiveData[i]["point"] == "start" && !starterIDs.Contains(npcID))
                                 {
