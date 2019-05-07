@@ -91,8 +91,8 @@ namespace WowHeadParser.Entities
             String questSerieXml = Tools.ExtractJsonFromWithPattern(questHtml, seriePattern);
             String questClassLineJSon = Tools.ExtractJsonFromWithPattern(questHtml, classLinePattern);
 
-            bool isAlliance = questHtml.Contains(@"Faction\x20\x3A\x20\x5Bspan\x20class\x3Dicon\x2Dalliance\x5DAlliance");
-            bool isHorde    = questHtml.Contains(@"Faction\x20\x3A\x20\x5Bspan\x20class\x3Dicon\x2Dhorde\x5DHorde");
+            bool isAlliance = questHtml.Contains(@"Side: [span class=icon-alliance]Alliance[\/span]");
+            bool isHorde    = questHtml.Contains(@"Side: [span class=icon-horde]Horde[\/span]");
 
             if (questDataJSon != null)
             {
