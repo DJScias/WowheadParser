@@ -85,7 +85,7 @@ namespace WowHeadParser.Entities
 
             String dataPattern = @"var myMapper = new Mapper\((.+)\)";
             String seriePattern = "(<table class=\"series\">.+?</table>)";
-            String classLinePattern = @"\[li\]Classes: (.+)\[\\/li\]\[li\]\[icon name=quest_start\]";
+            String classLinePattern = @"\[li\](?:Class|Classes): (.+)\[\\/li\]\[li\]\[icon name=quest_start\]";
 
             String questDataJSon = Tools.ExtractJsonFromWithPattern(questHtml, dataPattern);
             String questSerieXml = Tools.ExtractJsonFromWithPattern(questHtml, seriePattern);
