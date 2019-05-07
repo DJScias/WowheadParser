@@ -8,7 +8,7 @@ Unchecked box means the option might be incomplete and/or broken. Eventually all
 - [x] Creature
 - [x] Gameobject
 - [x] Item
-- [ ] Quest
+- [x] Quest
 - [ ] Zone
 
 ## Screenshots
