@@ -107,9 +107,13 @@ namespace WowHeadParser.Entities
 
             SetTeam(isAlliance, isHorde);
 
-
-            List<String> questClass = Tools.ExtractListJsonFromWithPattern(questClassLineJSon, @"\[class=(\d+)\]");
-            SetClassRequired(questClass);
+            if (questClassLineJSon != null)
+            {
+                List<String> questClass = Tools.ExtractListJsonFromWithPattern(questClassLineJSon, @"\[class=(\d+)\]");
+                SetClassRequired(questClass);
+            }
+            else
+                m_builderRequiredClass.AppendFieldsValue(m_data.id, 0);
 
             return true;
         }
