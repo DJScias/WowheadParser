@@ -181,9 +181,9 @@ namespace WowHeadParser
         private void comboBoxChoice_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (comboBoxChoice.SelectedIndex == 1)
-                HideToTextbox(true);
-            else
                 HideToTextbox(false);
+            else
+                HideToTextbox(true);
         }
 
         private void HideToTextbox(bool hide)
