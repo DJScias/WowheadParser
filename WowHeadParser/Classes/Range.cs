@@ -11,6 +11,7 @@ namespace WowHeadParser
 {
     class Range
     {
+        static object locker = new object();
         const int MAX_WORKER = 20;
 
         public Range(MainWindow view, String fileName)
@@ -68,17 +69,23 @@ namespace WowHeadParser
                 e.Result = e.Argument;
                 Entity entity = m_view.CreateNeededEntity(m_from + tempIndex);
                 entity.webClient = m_webClients[(int)e.Result];
-                entity.ParseSingleJson();
-                String requestText = "\n\n" + entity.GetSQLRequest();
-                requestText += requestText != "" ? "\n" : "";
-                File.AppendAllText(m_fileName, entity.GetSQLRequest());
+                // If entity is false, don't even continue here
+                if (entity.ParseSingleJson())
+                {
+                    String requestText = "\n\n" + entity.GetSQLRequest();
+                    requestText += requestText != "" ? "\n" : "";
+                    lock (locker)
+                    { // AppendAllTexts is not thread safe, by using a lock it will be
+                        File.AppendAllText(m_fileName, entity.GetSQLRequest());
+                    }
+                }
             }
             catch (Exception ex)
             {
                 if (ex.Message.IndexOf("404") != -1)
                     Console.WriteLine("Introuvable");
                 else
-                    Console.WriteLine("Erreur");
+                    Console.WriteLine("Erreur" + ex);
             }
             ++m_parsedEntitiesCount;
         }
