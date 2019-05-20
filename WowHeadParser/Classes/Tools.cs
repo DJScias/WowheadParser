@@ -176,7 +176,7 @@ namespace WowHeadParser
 
             try
             {
-                using (HttpResponseMessage response = webClient.GetAsync(url).Result)
+                using (HttpResponseMessage response = webClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead).Result)
                 {
                     using (HttpContent content = response.Content)
                     {
