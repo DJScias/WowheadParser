@@ -169,7 +169,6 @@ namespace WowHeadParser.Entities
                     return false;
             }
 
-
             if (IsCheckboxChecked("template"))
             {
                 String modelPattern = @"ModelViewer\.show\(\{type: [0-9]+, typeId: " + m_creatureTemplateData.id + @", displayId: ([0-9]+)";

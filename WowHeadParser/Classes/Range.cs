@@ -77,6 +77,8 @@ namespace WowHeadParser
                     lock (locker)
                     { // AppendAllTexts is not thread safe, by using a lock it will be
                         File.AppendAllText(m_fileName, entity.GetSQLRequest());
+                        ++m_parsedEntitiesCount;
+                        return;
                     }
                 }
             }
