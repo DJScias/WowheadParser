@@ -116,11 +116,8 @@ namespace WowHeadParser
 
             Console.WriteLine("Affected: " + m_parsedEntitiesCount);
 
-            float percent = ((float)m_index / (float)m_array.Count) * 100;
-
             if (m_view != null)
             {
-                m_view.setProgressBar((int)percent);
                 EstimateSecondsTimeLeft();
             }
 
@@ -169,7 +166,12 @@ namespace WowHeadParser
             float timeByEntity = (float)elapsedSeconds / (float)m_parsedEntitiesCount;
 
             float estimatedSecondsLeft = timeByEntity * (entityCount - m_parsedEntitiesCount);
+            float totalTime = timeByEntity * entityCount;
+            float percent = estimatedSecondsLeft / totalTime * 100;
 
+            // percent: actually percent unfinished from 100
+            // So percent = 75 would mean we're 25% done
+            m_view.setProgressBar(100 - (int)percent);
             m_view.SetTimeLeft((Int32)estimatedSecondsLeft);
         }
 
