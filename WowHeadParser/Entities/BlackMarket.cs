@@ -35,16 +35,21 @@ namespace WowHeadParser.Entities
 
             String blackMarketItemsPattern = @"var listviewitems = (\[.+\]);";
             String allBlackMarketItemJson = Tools.ExtractJsonFromWithPattern(blackMarketHtml, blackMarketItemsPattern);
-            BlackMarketItem[] allBlackMarketItemsParsing = JsonConvert.DeserializeObject<BlackMarketItem[]>(allBlackMarketItemJson);
 
             List<Entity> tempArray = new List<Entity>();
-            foreach (BlackMarketItem blackMarketItemsParsing in allBlackMarketItemsParsing)
-            {
-                if (blackMarketItemsParsing.level > UInt32.Parse(zoneId))
-                    continue;
 
-                BlackMarket bm = new BlackMarket(blackMarketItemsParsing.id);
-                tempArray.Add(bm);
+            if (allBlackMarketItemJson != null)
+            {
+                BlackMarketItem[] allBlackMarketItemsParsing = JsonConvert.DeserializeObject<BlackMarketItem[]>(allBlackMarketItemJson);
+
+                foreach (BlackMarketItem blackMarketItemsParsing in allBlackMarketItemsParsing)
+                {
+                    if (blackMarketItemsParsing.level > UInt32.Parse(zoneId))
+                        continue;
+
+                    BlackMarket bm = new BlackMarket(blackMarketItemsParsing.id);
+                    tempArray.Add(bm);
+                }
             }
 
             return tempArray;

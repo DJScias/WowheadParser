@@ -60,12 +60,15 @@ namespace WowHeadParser.Entities
             String pattern = @"new Listview\({template: 'quest', id: 'quests', name: LANG\.tab_quests, tabs: tabsRelated, parent: 'lkljbjkb574', computeDataFunc: Listview\.funcBox\.initQuestFilter, onAfterCreate: Listview\.funcBox\.addQuestIndicator,(?: note: WH\.sprintf\(LANG\.lvnote_zonequests, [0-9]+, [0-9]+, '[a-zA-ZÉèéêîÎ’'\- ]+', [0-9]+\),)? data: (.+)}\);";
             String creatureJSon = Tools.ExtractJsonFromWithPattern(zoneHtml, pattern);
 
-            List<CreatureTemplateParsing> parsingArray = JsonConvert.DeserializeObject<List<CreatureTemplateParsing>>(creatureJSon);
             List<Entity> tempArray = new List<Entity>();
-            foreach (CreatureTemplateParsing creatureTemplateStruct in parsingArray)
+            if (creatureJSon != null)
             {
-                Quest questTemplate = new Quest(creatureTemplateStruct.id);
-                tempArray.Add(questTemplate);
+                List<CreatureTemplateParsing> parsingArray = JsonConvert.DeserializeObject<List<CreatureTemplateParsing>>(creatureJSon);
+                foreach (CreatureTemplateParsing creatureTemplateStruct in parsingArray)
+                {
+                    Quest questTemplate = new Quest(creatureTemplateStruct.id);
+                    tempArray.Add(questTemplate);
+                }
             }
 
             return tempArray;

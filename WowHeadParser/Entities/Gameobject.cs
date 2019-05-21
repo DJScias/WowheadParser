@@ -59,13 +59,17 @@ namespace WowHeadParser.Entities
             String pattern = @"new Listview\(\{template: 'object', id: 'objects', name: LANG.tab_objects, tabs: tabsRelated, parent: 'lkljbjkb574', note: WH.sprintf\(LANG\.lvnote_filterresults, '\/objects\?filter=cr=1;crs=" + zoneId + @";crv=0'\), data: (.+)\}\);";
             String gameobjectJSon = Tools.ExtractJsonFromWithPattern(zoneHtml, pattern);
 
-            List<GameObjectParsing> parsingArray = JsonConvert.DeserializeObject<List<GameObjectParsing>>(gameobjectJSon);
             List<Entity> tempArray = new List<Entity>();
-            foreach (GameObjectParsing gameobjectTemplateStruct in parsingArray)
+            if (gameobjectJSon != null)
             {
-                Gameobject gameobject = new Gameobject(gameobjectTemplateStruct.id);
-                tempArray.Add(gameobject);
+                List<GameObjectParsing> parsingArray = JsonConvert.DeserializeObject<List<GameObjectParsing>>(gameobjectJSon);
+                foreach (GameObjectParsing gameobjectTemplateStruct in parsingArray)
+                {
+                    Gameobject gameobject = new Gameobject(gameobjectTemplateStruct.id);
+                    tempArray.Add(gameobject);
+                }
             }
+
 
             return tempArray;
         }
