@@ -90,10 +90,10 @@ namespace WowHeadParser.Entities
            }
            */
 
-            String itemSpellPattern = @"new Listview\(\{template: 'spell', id: 'reagent-for', name: LANG\.tab_reagentfor, tabs: tabsRelated, parent: 'lkljbjkb574',.*(?:\n)?.*data: (.+)\}\);";
-
             if (IsCheckboxChecked("create item"))
             {
+                String itemSpellPattern = @"new Listview\(\{template: 'spell', id: 'reagent-for', name: LANG\.tab_reagentfor, tabs: tabsRelated, parent: 'lkljbjkb574',.*(?:\n)?.*data: (.+)\}\);";
+
                 String itemSpellJSon = Tools.ExtractJsonFromWithPattern(itemHtml, itemSpellPattern);
                 if (itemSpellJSon != null)
                 {
