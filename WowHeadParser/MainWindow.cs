@@ -94,7 +94,8 @@ namespace WowHeadParser
             Properties.Settings.Default.Save();
 
             ids = new List<String>(textBoxFrom.Text.Split(' '));
-            m_fileName = Tools.GetFileNameForCurrentTime("_" + comboBoxEntity.Items[comboBoxEntity.SelectedIndex].ToString());
+            m_optionName = "_" + comboBoxEntity.Items[comboBoxEntity.SelectedIndex].ToString();
+            m_fileName = Tools.GetFileNameForCurrentTime(m_optionName);
             StartParsing();
 
             SetStartButtonEnableState(false);
@@ -109,7 +110,7 @@ namespace WowHeadParser
                 {
                     int firstId = Int32.Parse(ids[currentId]);
 
-                    Range range = new Range(this, m_fileName);
+                    Range range = new Range(this, m_fileName, m_optionName);
                     range.StartParsing(firstId, firstId);
 
                     break;
@@ -119,14 +120,14 @@ namespace WowHeadParser
                     int firstId = Int32.Parse(textBoxFrom.Text);
                     int lastId = Int32.Parse(textBoxTo.Text);
 
-                    Range range = new Range(this, m_fileName);
+                    Range range = new Range(this, m_fileName, m_optionName);
                     range.StartParsing(firstId, lastId);
 
                     break;
                 }
                 case 2:
                 {
-                    Zone zone = new Zone(this);
+                    Zone zone = new Zone(this, m_optionName);
                     zone.StartParsing(ids[currentId]);
                     break;
                 }
@@ -281,6 +282,7 @@ namespace WowHeadParser
                     leftDataGroup.Text = "Data";
                     leftListView.Items.Add("create item");
                     leftListView.Items.Add("dropped by");
+                    leftListView.Items.Add("locale");
                     leftListView.Items.Add("loot");
                     break;
                 }
@@ -350,5 +352,6 @@ namespace WowHeadParser
         private int currentId;
         private List<String> ids;
         private String m_fileName;
+        private String m_optionName;
     }
 }

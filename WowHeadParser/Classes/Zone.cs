@@ -14,7 +14,7 @@ namespace WowHeadParser
     {
         const int MAX_WORKER = 50;
 
-        public Zone(MainWindow view)
+        public Zone(MainWindow view, String optionName)
         {
             m_view = view;
             m_zoneId = "0";
@@ -22,8 +22,9 @@ namespace WowHeadParser
             m_parsedEntitiesCount = 0;
             m_getZoneListBackgroundWorker = new BackgroundWorker[MAX_WORKER];
 
-            m_fileName  = "";
-            m_array     = new List<Entity>();
+            m_fileName      = "";
+            m_optionName    = optionName;
+            m_array         = new List<Entity>();
         }
 
         private void ResetZone()
@@ -35,7 +36,7 @@ namespace WowHeadParser
             m_array.Clear();
             m_parsedEntitiesCount = 0;
             m_timestamp = Tools.GetUnixTimestamp();
-            m_fileName = Tools.GetFileNameForCurrentTime("");
+            m_fileName = Tools.GetFileNameForCurrentTime(m_optionName);
             m_timestamp = (Int32)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
         }
 
@@ -178,6 +179,7 @@ namespace WowHeadParser
         private String m_zoneHtml;
 
         private String m_fileName;
+        private String m_optionName;
 
         private List<Entity> m_array;
         private int m_index;

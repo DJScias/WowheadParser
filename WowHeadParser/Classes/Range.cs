@@ -14,7 +14,7 @@ namespace WowHeadParser
         static object locker = new object();
         const int MAX_WORKER = 20;
 
-        public Range(MainWindow view, String fileName)
+        public Range(MainWindow view, String fileName, String optionName)
         {
             m_view = view;
             m_index = 0;
@@ -23,6 +23,7 @@ namespace WowHeadParser
             m_webClients = new HttpClient[MAX_WORKER];
 
             m_fileName = fileName;
+            m_optionName = optionName;
             m_lastEstimateTime = 0;
         }
 
@@ -37,10 +38,10 @@ namespace WowHeadParser
             m_to    = to;
             m_entityTodoCount = to - from + 1; // + 1 car le premier est compris
 
-            StartSnifByEntity();
+            StartSniffByEntity();
         }
 
-        void StartSnifByEntity()
+        void StartSniffByEntity()
         {
             m_index = 0;
             m_parsedEntitiesCount = 0;
@@ -141,6 +142,7 @@ namespace WowHeadParser
         private MainWindow m_view;
 
         private String m_fileName;
+        private String m_optionName;
 
         private int m_from;
         private int m_to;
