@@ -94,7 +94,7 @@ namespace WowHeadParser
             Properties.Settings.Default.Save();
 
             ids = new List<String>(textBoxFrom.Text.Split(' '));
-            m_fileName = Tools.GetFileNameForCurrentTime();
+            m_fileName = Tools.GetFileNameForCurrentTime("_" + comboBoxEntity.Items[comboBoxEntity.SelectedIndex].ToString());
             StartParsing();
 
             SetStartButtonEnableState(false);

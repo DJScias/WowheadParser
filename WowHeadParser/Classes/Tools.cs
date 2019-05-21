@@ -200,9 +200,9 @@ namespace WowHeadParser
                 return "http://www.wowhead.com/" + id;
         }
 
-        public static String GetFileNameForCurrentTime()
+        public static String GetFileNameForCurrentTime(String optionName)
         {
-            return DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss") + ".sql";
+            return "SQL\\" + DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss") + optionName + ".sql";
         }
 
         public static List<String> ExtractListJsonFromWithPattern(String input, String pattern)

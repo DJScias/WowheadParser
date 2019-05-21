@@ -76,6 +76,7 @@ namespace WowHeadParser
                     requestText += requestText != "" ? "\n" : "";
                     lock (locker)
                     { // AppendAllTexts is not thread safe, by using a lock it will be
+                        Directory.CreateDirectory(Path.GetDirectoryName(m_fileName));
                         File.AppendAllText(m_fileName, entity.GetSQLRequest());
                     }
                 }

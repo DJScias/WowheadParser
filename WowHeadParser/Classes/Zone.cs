@@ -35,7 +35,7 @@ namespace WowHeadParser
             m_array.Clear();
             m_parsedEntitiesCount = 0;
             m_timestamp = Tools.GetUnixTimestamp();
-            m_fileName = Tools.GetFileNameForCurrentTime();
+            m_fileName = Tools.GetFileNameForCurrentTime("");
             m_timestamp = (Int32)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
         }
 
