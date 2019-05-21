@@ -170,6 +170,8 @@ namespace WowHeadParser.Entities
                     return false;
             }
 
+            if (IsCheckboxChecked("locale"))
+                optionSelected = true;
 
             if (IsCheckboxChecked("template"))
             {
