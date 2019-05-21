@@ -120,7 +120,7 @@
             // timeLeftLabel
             // 
             this.timeLeftLabel.AutoSize = true;
-            this.timeLeftLabel.Location = new System.Drawing.Point(305, 252);
+            this.timeLeftLabel.Location = new System.Drawing.Point(274, 252);
             this.timeLeftLabel.Name = "timeLeftLabel";
             this.timeLeftLabel.Size = new System.Drawing.Size(62, 13);
             this.timeLeftLabel.TabIndex = 9;
@@ -139,7 +139,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(219, 252);
+            this.label1.Location = new System.Drawing.Point(188, 252);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(81, 13);
             this.label1.TabIndex = 12;
