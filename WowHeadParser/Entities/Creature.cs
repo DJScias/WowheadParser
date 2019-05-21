@@ -146,6 +146,7 @@ namespace WowHeadParser.Entities
             else if (m_creatureTemplateData.id == 0 && id != 0)
                 m_creatureTemplateData.id = id;
 
+            bool optionSelected = false;
             String creatureHtml = Tools.GetHtmlFromWowhead(GetWowheadUrl(), webClient);
 
             if (creatureHtml.Contains("inputbox-error") || creatureHtml.Contains("database-detail-page-not-found-message"))
@@ -176,6 +177,7 @@ namespace WowHeadParser.Entities
 
                 String modelId = Tools.ExtractJsonFromWithPattern(creatureHtml, modelPattern);
                 m_modelid = modelId != null ? Int32.Parse(modelId) : 0;
+                optionSelected = true;
             }
 
             if (IsCheckboxChecked("vendor"))
@@ -186,6 +188,7 @@ namespace WowHeadParser.Entities
                 {
                     NpcVendorParsing[] npcVendorDatas = JsonConvert.DeserializeObject<NpcVendorParsing[]>(npcVendorJSon);
                     SetNpcVendorData(npcVendorDatas);
+                    optionSelected = true;
                 }
             }
 
@@ -202,6 +205,7 @@ namespace WowHeadParser.Entities
                     CreatureLootCurrencyParsing[] creatureLootCurrencyDatas = creatureLootCurrencyJSon != null ? JsonConvert.DeserializeObject<CreatureLootCurrencyParsing[]>(creatureLootCurrencyJSon) : new CreatureLootCurrencyParsing[0];
 
                     SetCreatureLootData(creatureLootDatas, creatureLootCurrencyDatas);
+                    optionSelected = true;
                 }
             }
 
@@ -215,6 +219,7 @@ namespace WowHeadParser.Entities
                 {
                     CreatureLootItemParsing[] creatureLootDatas = JsonConvert.DeserializeObject<CreatureLootItemParsing[]>(creatureSkinningJSon);
                     SetCreatureSkinningData(creatureLootDatas, Int32.Parse(creatureSkinningCount));
+                    optionSelected = true;
                 }
             }
 
@@ -227,6 +232,7 @@ namespace WowHeadParser.Entities
                 {
                     CreatureTrainerParsing[] creatureTrainerDatas = JsonConvert.DeserializeObject<CreatureTrainerParsing[]>(creatureTrainerJSon);
                     m_creatureTrainerDatas = creatureTrainerDatas;
+                    optionSelected = true;
                 }
             }
 
@@ -239,6 +245,7 @@ namespace WowHeadParser.Entities
                 {
                     QuestStarterEnderParsing[] creatureQuestStarterDatas = JsonConvert.DeserializeObject<QuestStarterEnderParsing[]>(creatureQuestStarterJSon);
                     m_creatureQuestStarterDatas = creatureQuestStarterDatas;
+                    optionSelected = true;
                 }
             }
 
@@ -251,10 +258,14 @@ namespace WowHeadParser.Entities
                 {
                     QuestStarterEnderParsing[] creatureQuestEnderDatas = JsonConvert.DeserializeObject<QuestStarterEnderParsing[]>(creatureQuestEnderJSon);
                     m_creatureQuestEnderDatas = creatureQuestEnderDatas;
+                    optionSelected = true;
                 }
             }
 
-            return true;
+            if (optionSelected)
+                return true;
+            else
+                return false;
         }
 
         public void SetCreatureTemplateData(CreatureTemplateParsing creatureData, String money, String creatureHealthDataJSon)
