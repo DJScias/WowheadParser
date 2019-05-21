@@ -77,13 +77,10 @@ namespace WowHeadParser.Entities
             else if (m_data.id == 0 && id != 0)
                 m_data.id = id;
 
+            bool optionSelected = false;
             String gameobjectHtml = Tools.GetHtmlFromWowhead(GetWowheadUrl());
 
             String gameobjectDataPattern = @"\$\.extend\(g_objects\[" + m_data.id + @"\], (.+)\);";
-            String gameobjectLootPattern = @"new Listview\(\{template: 'item', id: 'contains', name: LANG.tab_contains, tabs: tabsRelated, parent: 'lkljbjkb574', extraCols: \[Listview.extraCols.count, Listview.extraCols.percent(?:, Listview\.extraCols\.mode)?\], sort:\['-percent', 'name'\], _totalCount: [0-9]+, computeDataFunc: Listview.funcBox.initLootTable, onAfterCreate: Listview.funcBox.addModeIndicator, data: (.+)\}\);";
-            String gameobjectLootCurrencyPattern = @"new Listview\({template: 'currency', id: 'contains-currency', name: LANG\.tab_currencies, tabs: tabsRelated, parent: 'lkljbjkb574', extraCols: \[Listview\.extraCols\.count, Listview\.extraCols\.percent\], sort:\['-percent', 'name'\], _totalCount: [0-9]+, computeDataFunc: Listview\.funcBox\.initLootTable, onAfterCreate: Listview\.funcBox\.addModeIndicator, data: (.+)}\);";
-            String gameobjectHerboPattern = @"new Listview\(\{template: 'item', id: 'herbalism', name: LANG.tab_herbalism, tabs: tabsRelated, parent: 'lkljbjkb574', extraCols: \[Listview.extraCols.count, Listview.extraCols.percent\], sort:\['-percent', 'name'\], computeDataFunc: Listview.funcBox.initLootTable, note: WH\.sprintf\(LANG.lvnote_objectherbgathering, [0-9]+\), _totalCount: ([0-9]+), data: (.+)\}\);";
-            String gameobjectMiningPattern = @"new Listview\(\{template: 'item', id: 'mining', name: LANG\.tab_mining, tabs: tabsRelated, parent: 'lkljbjkb574', extraCols: \[Listview\.extraCols\.count, Listview\.extraCols\.percent], sort:\['-percent', 'name'\], computeDataFunc: Listview\.funcBox\.initLootTable, note: WH\.sprintf\(LANG\.lvnote_objectmining, [0-9]+\), _totalCount: ([0-9]+), data: (.+)\}\);";
 
             String gameobjectDataJSon = Tools.ExtractJsonFromWithPattern(gameobjectHtml, gameobjectDataPattern);
             if (gameobjectDataJSon != null)
@@ -91,32 +88,57 @@ namespace WowHeadParser.Entities
                 m_data = JsonConvert.DeserializeObject<GameObjectParsing>(gameobjectDataJSon);
             }
 
-            String gameobjectLootItemJSon = Tools.ExtractJsonFromWithPattern(gameobjectHtml, gameobjectLootPattern);
-            String gameobjectLootCurrencyJSon = Tools.ExtractJsonFromWithPattern(gameobjectHtml, gameobjectLootCurrencyPattern);
-            if (gameobjectLootItemJSon != null || gameobjectLootCurrencyJSon != null)
+            if (IsCheckboxChecked("locale"))
+                optionSelected = true;
+
+            if (IsCheckboxChecked("loot"))
             {
-                GameObjectLootItemParsing[] gameobjectLootItemDatas = gameobjectLootItemJSon != null ? JsonConvert.DeserializeObject<GameObjectLootItemParsing[]>(gameobjectLootItemJSon) : new GameObjectLootItemParsing[0];
-                GameObjectLootCurrencyParsing[] gameobjectLootCurrencyDatas = gameobjectLootCurrencyJSon != null ? JsonConvert.DeserializeObject<GameObjectLootCurrencyParsing[]>(gameobjectLootCurrencyJSon) : new GameObjectLootCurrencyParsing[0];
-                SetGameobjectLootData(gameobjectLootItemDatas, gameobjectLootCurrencyDatas);
+                String gameobjectLootPattern = @"new Listview\(\{template: 'item', id: 'contains', name: LANG.tab_contains, tabs: tabsRelated, parent: 'lkljbjkb574', extraCols: \[Listview.extraCols.count, Listview.extraCols.percent(?:, Listview\.extraCols\.mode)?\], sort:\['-percent', 'name'\], _totalCount: [0-9]+, computeDataFunc: Listview.funcBox.initLootTable, onAfterCreate: Listview.funcBox.addModeIndicator, data: (.+)\}\);";
+                String gameobjectLootCurrencyPattern = @"new Listview\({template: 'currency', id: 'contains-currency', name: LANG\.tab_currencies, tabs: tabsRelated, parent: 'lkljbjkb574', extraCols: \[Listview\.extraCols\.count, Listview\.extraCols\.percent\], sort:\['-percent', 'name'\], _totalCount: [0-9]+, computeDataFunc: Listview\.funcBox\.initLootTable, onAfterCreate: Listview\.funcBox\.addModeIndicator, data: (.+)}\);";
+
+                String gameobjectLootItemJSon = Tools.ExtractJsonFromWithPattern(gameobjectHtml, gameobjectLootPattern);
+                String gameobjectLootCurrencyJSon = Tools.ExtractJsonFromWithPattern(gameobjectHtml, gameobjectLootCurrencyPattern);
+                if (gameobjectLootItemJSon != null || gameobjectLootCurrencyJSon != null)
+                {
+                    GameObjectLootItemParsing[] gameobjectLootItemDatas = gameobjectLootItemJSon != null ? JsonConvert.DeserializeObject<GameObjectLootItemParsing[]>(gameobjectLootItemJSon) : new GameObjectLootItemParsing[0];
+                    GameObjectLootCurrencyParsing[] gameobjectLootCurrencyDatas = gameobjectLootCurrencyJSon != null ? JsonConvert.DeserializeObject<GameObjectLootCurrencyParsing[]>(gameobjectLootCurrencyJSon) : new GameObjectLootCurrencyParsing[0];
+                    SetGameobjectLootData(gameobjectLootItemDatas, gameobjectLootCurrencyDatas);
+                    optionSelected = true;
+                }
             }
 
-            String gameobjectHerbalismTotalCount = Tools.ExtractJsonFromWithPattern(gameobjectHtml, gameobjectHerboPattern, 0);
-            String gameobjectHerbalismJSon = Tools.ExtractJsonFromWithPattern(gameobjectHtml, gameobjectHerboPattern, 1);
-            if (gameobjectHerbalismJSon != null)
-            {
-                GameObjectLootParsing[] gameobjectHerbalismDatas = JsonConvert.DeserializeObject<GameObjectLootParsing[]>(gameobjectHerbalismJSon);
-                SetGameobjectHerbalismOrMiningData(gameobjectHerbalismDatas, Int32.Parse(gameobjectHerbalismTotalCount), true);
+            if (IsCheckboxChecked("herbalism"))
+            {       
+                String gameobjectHerboPattern = @"new Listview\(\{template: 'item', id: 'herbalism', name: LANG.tab_herbalism, tabs: tabsRelated, parent: 'lkljbjkb574', extraCols: \[Listview.extraCols.count, Listview.extraCols.percent\], sort:\['-percent', 'name'\], computeDataFunc: Listview.funcBox.initLootTable, note: WH\.sprintf\(LANG.lvnote_objectherbgathering, [0-9]+\), _totalCount: ([0-9]+), data: (.+)\}\);";
+
+                String gameobjectHerbalismTotalCount = Tools.ExtractJsonFromWithPattern(gameobjectHtml, gameobjectHerboPattern, 0);
+                String gameobjectHerbalismJSon = Tools.ExtractJsonFromWithPattern(gameobjectHtml, gameobjectHerboPattern, 1);
+                if (gameobjectHerbalismJSon != null)
+                {
+                    GameObjectLootParsing[] gameobjectHerbalismDatas = JsonConvert.DeserializeObject<GameObjectLootParsing[]>(gameobjectHerbalismJSon);
+                    SetGameobjectHerbalismOrMiningData(gameobjectHerbalismDatas, Int32.Parse(gameobjectHerbalismTotalCount), true);
+                    optionSelected = true;
+                }
             }
 
-            String gameobjectMiningTotalCount = Tools.ExtractJsonFromWithPattern(gameobjectHtml, gameobjectMiningPattern, 0);
-            String gameobjectMiningJSon = Tools.ExtractJsonFromWithPattern(gameobjectHtml, gameobjectMiningPattern, 1);
-            if (gameobjectMiningJSon != null)
+            if (IsCheckboxChecked("mining"))
             {
-                GameObjectLootParsing[] gameobjectMiningDatas = JsonConvert.DeserializeObject<GameObjectLootParsing[]>(gameobjectMiningJSon);
-                SetGameobjectHerbalismOrMiningData(gameobjectMiningDatas, Int32.Parse(gameobjectMiningTotalCount), false);
+                String gameobjectMiningPattern = @"new Listview\(\{template: 'item', id: 'mining', name: LANG\.tab_mining, tabs: tabsRelated, parent: 'lkljbjkb574', extraCols: \[Listview\.extraCols\.count, Listview\.extraCols\.percent], sort:\['-percent', 'name'\], computeDataFunc: Listview\.funcBox\.initLootTable, note: WH\.sprintf\(LANG\.lvnote_objectmining, [0-9]+\), _totalCount: ([0-9]+), data: (.+)\}\);";
+
+                String gameobjectMiningTotalCount = Tools.ExtractJsonFromWithPattern(gameobjectHtml, gameobjectMiningPattern, 0);
+                String gameobjectMiningJSon = Tools.ExtractJsonFromWithPattern(gameobjectHtml, gameobjectMiningPattern, 1);
+                if (gameobjectMiningJSon != null)
+                {
+                    GameObjectLootParsing[] gameobjectMiningDatas = JsonConvert.DeserializeObject<GameObjectLootParsing[]>(gameobjectMiningJSon);
+                    SetGameobjectHerbalismOrMiningData(gameobjectMiningDatas, Int32.Parse(gameobjectMiningTotalCount), false);
+                    optionSelected = true;
+                }
             }
 
-            return true;
+            if (optionSelected)
+                return true;
+            else
+                return false;
         }
 
         public void SetGameobjectLootData(GameObjectLootItemParsing[] gameobjectLootItemDatas, GameObjectLootCurrencyParsing[] gameobjectLootCurrencyDatas)
@@ -141,10 +163,7 @@ namespace WowHeadParser.Entities
                         outof = (float)Convert.ToDouble(gameobjectLootDatas[i].modes[mode]["outof"]);
                         percent = count * 100 / outof;
                     }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine(e.Message);
-                    }
+                    catch (Exception) { }
                 }
 
                 GameObjectLootItemParsing currentItemParsing = null;
@@ -152,7 +171,7 @@ namespace WowHeadParser.Entities
                 {
                     currentItemParsing = (GameObjectLootItemParsing)gameobjectLootDatas[i];
                 }
-                catch (Exception ex) { }
+                catch (Exception) { }
 
                 gameobjectLootDatas[i].questRequired = currentItemParsing != null && currentItemParsing.classs == 12 ? "1": "0";
 
