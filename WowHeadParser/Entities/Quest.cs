@@ -78,44 +78,64 @@ namespace WowHeadParser.Entities
             else if (m_data.id == 0 && id != 0)
                 m_data.id = id;
 
+            bool optionSelected = false;
             String questHtml = Tools.GetHtmlFromWowhead(GetWowheadUrl());
 
-            if (questHtml.Contains("inputbox-error"))
+            if (questHtml.Contains("inputbox-error") || questHtml.Contains("database-detail-page-not-found-message"))
                 return false;
 
-            String dataPattern = @"var myMapper = new Mapper\((.+)\)";
-            String seriePattern = "(<table class=\"series\">.+?</table>)";
-            String classLinePattern = @"\[li\](?:Class|Classes): (.+)\[\\/li\]\[li\]\[icon name=quest_start\]";
-
-            String questDataJSon = Tools.ExtractJsonFromWithPattern(questHtml, dataPattern);
-            String questSerieXml = Tools.ExtractJsonFromWithPattern(questHtml, seriePattern);
-            String questClassLineJSon = Tools.ExtractJsonFromWithPattern(questHtml, classLinePattern);
-
-            bool isAlliance = questHtml.Contains(@"Side: [span class=icon-alliance]Alliance[\/span]");
-            bool isHorde    = questHtml.Contains(@"Side: [span class=icon-horde]Horde[\/span]");
-
-            if (questDataJSon != null)
+            if (IsCheckboxChecked("starter/ender"))
             {
-                dynamic data = JsonConvert.DeserializeObject<dynamic>(questDataJSon);
-                SetData(data);
+                String dataPattern = @"var myMapper = new Mapper\((.+)\)";
+
+                String questDataJSon = Tools.ExtractJsonFromWithPattern(questHtml, dataPattern);
+                if (questDataJSon != null)
+                {
+                    dynamic data = JsonConvert.DeserializeObject<dynamic>(questDataJSon);
+                    SetData(data);
+                    optionSelected = true;
+                }
             }
 
-            if (questSerieXml != null)
+            if (IsCheckboxChecked("serie"))
             {
-                SetSerie(questSerieXml);
+                String seriePattern = "(<table class=\"series\">.+?</table>)";
+
+                String questSerieXml = Tools.ExtractJsonFromWithPattern(questHtml, seriePattern);
+                if (questSerieXml != null)
+                {
+                    SetSerie(questSerieXml);
+                    optionSelected = true;
+                }
             }
 
-            SetTeam(isAlliance, isHorde);
-
-            if (questClassLineJSon != null)
+            if (IsCheckboxChecked("class"))
             {
-                List<String> questClass = Tools.ExtractListJsonFromWithPattern(questClassLineJSon, @"\[class=(\d+)\]");
-                SetClassRequired(questClass);
+                String classLinePattern = @"\[li\](?:Class|Classes): (.+)\[\\/li\]\[li\]\[icon name=quest_start\]";
+
+                String questClassLineJSon = Tools.ExtractJsonFromWithPattern(questHtml, classLinePattern);
+                if (questClassLineJSon != null)
+                {
+                    List<String> questClass = Tools.ExtractListJsonFromWithPattern(questClassLineJSon, @"\[class=(\d+)\]");
+                    SetClassRequired(questClass);
+                }
+                else
+                    m_builderRequiredClass.AppendFieldsValue(m_data.id, 0);
+                optionSelected = true;
             }
+
+            if (IsCheckboxChecked("team"))
+            {
+                bool isAlliance = questHtml.Contains(@"Side: [span class=icon-alliance]Alliance[\/span]");
+                bool isHorde = questHtml.Contains(@"Side: [span class=icon-horde]Horde[\/span]");
+
+                SetTeam(isAlliance, isHorde);
+            }
+
+            if (optionSelected)
+                return true;
             else
-                m_builderRequiredClass.AppendFieldsValue(m_data.id, 0);
-
-            return true;
+                return false;
         }
 
         public void SetData(dynamic questData)
