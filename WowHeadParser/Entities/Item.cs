@@ -80,15 +80,18 @@ namespace WowHeadParser.Entities
                 m_data = JsonConvert.DeserializeObject<ItemParsing>(itemDataJSon);
             }
 
-           /* We currently don't use an item's quality for anything
-           String qualityPattern = @"_\[" + m_data.id + @"\]" + "={\"name_frfr\":\"(?:.+?)\",\"quality\":([0-9])";
+            if (IsCheckboxChecked("locale"))
+                optionSelected = true;
 
-           String itemQuality = Tools.ExtractJsonFromWithPattern(itemHtml, qualityPattern);
-           if (itemQuality != null)
-           {
-               Int32.TryParse(itemQuality, out m_data.quality);
-           }
-           */
+            /* We currently don't use an item's quality for anything
+            String qualityPattern = @"_\[" + m_data.id + @"\]" + "={\"name_frfr\":\"(?:.+?)\",\"quality\":([0-9])";
+
+            String itemQuality = Tools.ExtractJsonFromWithPattern(itemHtml, qualityPattern);
+            if (itemQuality != null)
+            {
+                Int32.TryParse(itemQuality, out m_data.quality);
+            }
+            */
 
             if (IsCheckboxChecked("create item"))
             {
