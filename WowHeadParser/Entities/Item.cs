@@ -69,14 +69,10 @@ namespace WowHeadParser.Entities
             else if (m_data.id == 0 && id != 0)
                 m_data.id = id;
 
+            bool optionSelected = false;
             String itemHtml = Tools.GetHtmlFromWowhead(GetWowheadUrl());
 
             String dataPattern = @"\$\.extend\(g_items\[" + m_data.id + @"\], (.+)\);";
-            String qualityPattern = @"_\[" + m_data.id + @"\]" + "={\"name_frfr\":\"(?:.+?)\",\"quality\":([0-9])";
-            String itemSpellPattern = @"new Listview\(\{template: 'spell', id: 'reagent-for', name: LANG\.tab_reagentfor, tabs: tabsRelated, parent: 'lkljbjkb574',.*(?:\n)?.*data: (.+)\}\);";
-            String itemCreatePattern = @"new Listview\(\{template: 'item', id: 'creates', name: LANG\.tab_creates, tabs: tabsRelated, parent: 'lkljbjkb574', sort:\['name'\],.*(?:\n)?.*data: (.+)}\);";
-            String itemLootTemplatePattern = @"new Listview\(\{template: 'item', id: 'contains', name: LANG\.tab_contains, tabs: tabsRelated, parent: 'lkljbjkb574',\n* *extraCols: \[Listview\.extraCols\.count, Listview.extraCols.percent\], sort:\['-percent', 'name'\],\n* *computeDataFunc: Listview\.funcBox\.initLootTable, note: WH\.sprintf\(LANG\.lvnote_itemopening, [0-9]+\),\n* *_totalCount: ([0-9]+), data: (.+)\}\);";
-            String itemDroppedByPattern = @"new Listview\(\{template: 'npc', id: 'dropped-by', name: LANG\.tab_droppedby, tabs: tabsRelated, parent: 'lkljbjkb574',\n* *hiddenCols: \['type'\], extraCols: \[Listview.extraCols.count, Listview.extraCols.percent\], sort:\['-percent', '-count', 'name'\],\n* *computeDataFunc: Listview.funcBox.initLootTable, data: (.+)}\);";
 
             String itemDataJSon = Tools.ExtractJsonFromWithPattern(itemHtml, dataPattern);
             if (itemDataJSon != null)
@@ -84,39 +80,67 @@ namespace WowHeadParser.Entities
                 m_data = JsonConvert.DeserializeObject<ItemParsing>(itemDataJSon);
             }
 
-            String itemQuality = Tools.ExtractJsonFromWithPattern(itemHtml, qualityPattern);
-            if (itemQuality != null)
+           /* We currently don't use an item's quality for anything
+           String qualityPattern = @"_\[" + m_data.id + @"\]" + "={\"name_frfr\":\"(?:.+?)\",\"quality\":([0-9])";
+
+           String itemQuality = Tools.ExtractJsonFromWithPattern(itemHtml, qualityPattern);
+           if (itemQuality != null)
+           {
+               Int32.TryParse(itemQuality, out m_data.quality);
+           }
+           */
+
+            String itemSpellPattern = @"new Listview\(\{template: 'spell', id: 'reagent-for', name: LANG\.tab_reagentfor, tabs: tabsRelated, parent: 'lkljbjkb574',.*(?:\n)?.*data: (.+)\}\);";
+
+            if (IsCheckboxChecked("create item"))
             {
-                Int32.TryParse(itemQuality, out m_data.quality);
+                String itemSpellJSon = Tools.ExtractJsonFromWithPattern(itemHtml, itemSpellPattern);
+                if (itemSpellJSon != null)
+                {
+                    m_itemSpellDatas = JsonConvert.DeserializeObject<ItemSpellParsing[]>(itemSpellJSon);
+                    optionSelected = true;
+                }
+
+                String itemCreatePattern = @"new Listview\(\{template: 'item', id: 'creates', name: LANG\.tab_creates, tabs: tabsRelated, parent: 'lkljbjkb574', sort:\['name'\],.*(?:\n)?.*data: (.+)}\);";
+
+                String itemCreateJSon = Tools.ExtractJsonFromWithPattern(itemHtml, itemCreatePattern);
+                if (itemCreateJSon != null)
+                {
+                    m_itemCreateItemDatas = JsonConvert.DeserializeObject<ItemCreateItemParsing[]>(itemCreateJSon);
+                    optionSelected = true;
+                }
             }
 
-            String itemSpellJSon = Tools.ExtractJsonFromWithPattern(itemHtml, itemSpellPattern);
-            if (itemSpellJSon != null)
+            if (IsCheckboxChecked("loot"))
             {
-                m_itemSpellDatas = JsonConvert.DeserializeObject<ItemSpellParsing[]>(itemSpellJSon);
+                String itemLootTemplatePattern = @"new Listview\(\{template: 'item', id: 'contains', name: LANG\.tab_contains, tabs: tabsRelated, parent: 'lkljbjkb574',\n* *extraCols: \[Listview\.extraCols\.count, Listview.extraCols.percent\], sort:\['-percent', 'name'\],\n* *computeDataFunc: Listview\.funcBox\.initLootTable, note: WH\.sprintf\(LANG\.lvnote_itemopening, [0-9]+\),\n* *_totalCount: ([0-9]+), data: (.+)\}\);";
+
+                String lootMaxCountStr = Tools.ExtractJsonFromWithPattern(itemHtml, itemLootTemplatePattern, 0);
+                m_lootMaxCount = lootMaxCountStr != null ? Int32.Parse(lootMaxCountStr) : 0;
+                String itemLootTemplateJSon = Tools.ExtractJsonFromWithPattern(itemHtml, itemLootTemplatePattern, 1);
+                if (itemLootTemplateJSon != null)
+                {
+                    m_itemLootTemplateDatas = JsonConvert.DeserializeObject<ItemLootTemplateParsing[]>(itemLootTemplateJSon);
+                    optionSelected = true;
+                }
             }
 
-            String itemCreateJSon = Tools.ExtractJsonFromWithPattern(itemHtml, itemCreatePattern);
-            if (itemCreateJSon != null)
+            if (IsCheckboxChecked("dropped by"))
             {
-                m_itemCreateItemDatas = JsonConvert.DeserializeObject<ItemCreateItemParsing[]>(itemCreateJSon);
+                String itemDroppedByPattern = @"new Listview\(\{template: 'npc', id: 'dropped-by', name: LANG\.tab_droppedby, tabs: tabsRelated, parent: 'lkljbjkb574',\n* *hiddenCols: \['type'\], extraCols: \[Listview.extraCols.count, Listview.extraCols.percent\], sort:\['-percent', '-count', 'name'\],\n* *computeDataFunc: Listview.funcBox.initLootTable, data: (.+)}\);";
+
+                String itemDroppedByJson = Tools.ExtractJsonFromWithPattern(itemHtml, itemDroppedByPattern);
+                if (itemDroppedByJson != null)
+                {
+                    m_itemDroppedByDatas = JsonConvert.DeserializeObject<ItemDroppedByTemplateParsing[]>(itemDroppedByJson);
+                    optionSelected = true;
+                }
             }
 
-            String lootMaxCountStr      = Tools.ExtractJsonFromWithPattern(itemHtml, itemLootTemplatePattern, 0);
-            m_lootMaxCount              = lootMaxCountStr != null ? Int32.Parse(lootMaxCountStr): 0;
-            String itemLootTemplateJSon = Tools.ExtractJsonFromWithPattern(itemHtml, itemLootTemplatePattern, 1);
-            if (itemLootTemplateJSon != null)
-            {
-                m_itemLootTemplateDatas = JsonConvert.DeserializeObject<ItemLootTemplateParsing[]>(itemLootTemplateJSon);
-            }
-
-            String itemDroppedByJson = Tools.ExtractJsonFromWithPattern(itemHtml, itemDroppedByPattern);
-            if (itemDroppedByJson != null)
-            {
-                m_itemDroppedByDatas = JsonConvert.DeserializeObject<ItemDroppedByTemplateParsing[]>(itemDroppedByJson);
-            }
-
-            return true;
+            if (optionSelected)
+                return true;
+            else
+                return false;
         }
 
         public override String GetSQLRequest()
@@ -164,7 +188,7 @@ namespace WowHeadParser.Entities
                 foreach (ItemCreateItemParsing itemLootData in m_itemCreateItemDatas)
                     m_spellLootTemplateBuilder.AppendFieldsValue(m_itemSpellDatas[0].id, // Entry
                                                                  itemLootData.id, // Item
-                                                                 0, // Reference
+                                                                 0, // ReferenceitemLootData
                                                                  "100", // Chance
                                                                  0, // QuestRequired
                                                                  1, // LootMode
