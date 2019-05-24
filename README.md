@@ -19,5 +19,5 @@ The supported WoW versions are:
 ## Screenshots
 Design is not final *(is it ever?)*.
 
-![Main Window](https://github.com/DJScias/WowheadParser/blob/master/imgs/main.png?raw=true)
-![Creature Window](https://github.com/DJScias/WowheadParser/blob/master/imgs/creature.png?raw=true)
+![Main Window](imgs/main.png)
+![Creature Window](imgs/creature.png)
