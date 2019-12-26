@@ -132,7 +132,11 @@ namespace WowHeadParser
             float timeByEntity = (float)elapsedSeconds / (float)m_parsedEntitiesCount;
 
             float estimatedSecondsLeft = timeByEntity * (entityCount - m_parsedEntitiesCount);
+            if (estimatedSecondsLeft < 0)
+                estimatedSecondsLeft = 0;
             float totalTime = timeByEntity * entityCount;
+            if (totalTime < 1)
+                totalTime = 1;
             float percent = estimatedSecondsLeft / totalTime * 100;
             
             // percent: actually percent unfinished from 100
