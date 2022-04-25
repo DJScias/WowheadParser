@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 using static WowHeadParser.MainWindow;
 using System.Windows.Forms;
+using System.Diagnostics;
 
 namespace WowHeadParser.Entities
 {
@@ -125,8 +126,8 @@ namespace WowHeadParser.Entities
 
         public override List<Entity> GetIdsFromZone(String zoneId, String zoneHtml)
         {
-            String pattern = @"new Listview\(\{template: 'npc', id: 'npcs', name: LANG\.tab_npcs, tabs: tabsRelated, parent: 'lkljbjkb574', note: WH\.sprintf\(LANG\.lvnote_filterresults, '\/npcs\?filter=cr=6;crs=" + zoneId + @";crv=0'\), data: (.+)\}\);";
-            String creatureJSon = Tools.ExtractJsonFromWithPattern(zoneHtml, pattern);
+            String pattern = @"new Listview\(\{template: 'npc', id: 'npcs', name: WH.TERMS.npcs, tabs: tabsRelated, parent: 'lkljbjkb574',(.*)data: (.+)\}\);";
+            String creatureJSon = Tools.ExtractJsonFromWithPattern(zoneHtml, pattern, 1);
 
             List<Entity> tempArray = new List<Entity>();
             if (creatureJSon != null)
@@ -178,7 +179,7 @@ namespace WowHeadParser.Entities
 
             if (IsCheckboxChecked("template"))
             {
-                String modelPattern = @"ModelViewer\.show\(\{type: [0-9]+, typeId: " + m_creatureTemplateData.id + @", displayId: ([0-9]+)";
+                String modelPattern = @"WH.Wow.ModelViewer.showLightbox\(\{\&quot;type\&quot;:1,&quot;typeId\&quot;:" + m_creatureTemplateData.id + @",\&quot;displayId\&quot;:([0-9]+)\}\)";
 
                 String modelId = Tools.ExtractJsonFromWithPattern(creatureHtml, modelPattern);
                 m_modelid = modelId != null ? Int32.Parse(modelId) : 0;
@@ -187,8 +188,8 @@ namespace WowHeadParser.Entities
 
             if (IsCheckboxChecked("vendor"))
             {
-                String vendorPattern = @"new Listview\({template: 'item', id: 'sells', .+?, data: (.+)}\);";
-                String npcVendorJSon = Tools.ExtractJsonFromWithPattern(creatureHtml, vendorPattern);
+                String vendorPattern = @"new Listview\(\{template: 'item', id: 'sells', name: WH.TERMS.sells,(.*), data: (.+)\}\);";
+                String npcVendorJSon = Tools.ExtractJsonFromWithPattern(creatureHtml, vendorPattern, 1);
                 if (npcVendorJSon != null)
                 {
                     NpcVendorParsing[] npcVendorDatas = JsonConvert.DeserializeObject<NpcVendorParsing[]>(npcVendorJSon);
@@ -199,11 +200,11 @@ namespace WowHeadParser.Entities
 
             if (IsCheckboxChecked("loot"))
             {
-                String creatureLootPattern = @"new Listview\({template: 'item', id: 'drops', name: LANG\.tab_drops, tabs: tabsRelated, parent: 'lkljbjkb574', extraCols: \[Listview\.extraCols\.count, Listview\.extraCols\.percent(?:, Listview.extraCols.mode)?\],  showLootSpecs: [0-9],sort:\['-percent', 'name'\], _totalCount: [0-9]+, computeDataFunc: Listview\.funcBox\.initLootTable, onAfterCreate: Listview\.funcBox\.addModeIndicator, data: (.+)}\);";
-                String creatureCurrencyPattern = @"new Listview\({template: 'currency', id: 'drop-currency', name: LANG\.tab_currencies, tabs: tabsRelated, parent: 'lkljbjkb574', extraCols: \[Listview\.extraCols\.count, Listview\.extraCols\.percent\], sort:\['-percent', 'name'], _totalCount: [0-9]*, computeDataFunc: Listview\.funcBox\.initLootTable, onAfterCreate: Listview\.funcBox\.addModeIndicator, data: (.+)}\);";
+                String creatureLootPattern = @"new Listview\(\{template: 'item', id: 'drops', name: WH.TERMS.drops,(.*), data:(.+)\}\);";
+                String creatureCurrencyPattern = @"new Listview\({template: 'currency', id: 'drop-currency', name: WH.TERMS.currencies,(.*), data:(.+)\}\);";
 
-                String creatureLootJSon = Tools.ExtractJsonFromWithPattern(creatureHtml, creatureLootPattern);
-                String creatureLootCurrencyJSon = Tools.ExtractJsonFromWithPattern(creatureHtml, creatureCurrencyPattern);
+                String creatureLootJSon = Tools.ExtractJsonFromWithPattern(creatureHtml, creatureLootPattern, 1);
+                String creatureLootCurrencyJSon = Tools.ExtractJsonFromWithPattern(creatureHtml, creatureCurrencyPattern, 1);
                 if (creatureLootJSon != null || creatureLootCurrencyJSon != null)
                 {
                     CreatureLootItemParsing[] creatureLootDatas = creatureLootJSon != null ? JsonConvert.DeserializeObject<CreatureLootItemParsing[]>(creatureLootJSon) : new CreatureLootItemParsing[0];
@@ -216,7 +217,7 @@ namespace WowHeadParser.Entities
 
             if (IsCheckboxChecked("skinning"))
             {
-                String creatureSkinningPattern = @"new Listview\(\{template: 'item', id: 'skinning', name: LANG\.tab_skinning, tabs: tabsRelated, parent: 'lkljbjkb574', extraCols: \[Listview\.extraCols\.count, Listview\.extraCols\.percent\], sort:\['-percent', 'name'\], computeDataFunc: Listview\.funcBox\.initLootTable, note: WH\.sprintf\(LANG\.lvnote_npcskinning, [0-9]+\), _totalCount: ([0-9]+), data: (.+)}\);";
+                String creatureSkinningPattern = @"new Listview\(\{template: 'item', id: 'skinning',.*_totalCount: ([0-9]+),.*data:(.+)\}\);";
 
                 String creatureSkinningCount = Tools.ExtractJsonFromWithPattern(creatureHtml, creatureSkinningPattern, 0);
                 String creatureSkinningJSon = Tools.ExtractJsonFromWithPattern(creatureHtml, creatureSkinningPattern, 1);
@@ -230,7 +231,7 @@ namespace WowHeadParser.Entities
 
             if (IsCheckboxChecked("trainer"))
             {
-                String creatureTrainerPattern = @"new Listview\(\{template: 'spell', id: 'teaches-recipe', name: LANG\.tab_teaches, tabs: tabsRelated, parent: 'lkljbjkb574', visibleCols: \['source'\], data: (.+)\}\);";
+                String creatureTrainerPattern = @"new Listview\(\{template: 'spell', id: 'teaches-recipe', name: WH.TERMS.teaches, tabs: tabsRelated, parent: 'lkljbjkb574', visibleCols: \['source'\], data: (.+)\}\);";
 
                 String creatureTrainerJSon = Tools.ExtractJsonFromWithPattern(creatureHtml, creatureTrainerPattern);
                 if (creatureTrainerJSon != null)
@@ -243,7 +244,7 @@ namespace WowHeadParser.Entities
 
             if (IsCheckboxChecked("quest starter"))
             {
-                String creatureQuestStarterPattern = @"new Listview\(\{template: 'quest', id: 'starts', name: LANG\.tab_starts, tabs: tabsRelated, parent: 'lkljbjkb574', data: (.+)\}\);";
+                String creatureQuestStarterPattern = @"new Listview\(\{template: 'quest', id: 'starts', name: WH.TERMS.starts, tabs: tabsRelated, parent: 'lkljbjkb574', data: (.+)\}\);";
 
                 String creatureQuestStarterJSon = Tools.ExtractJsonFromWithPattern(creatureHtml, creatureQuestStarterPattern);
                 if (creatureQuestStarterJSon != null)
@@ -256,7 +257,7 @@ namespace WowHeadParser.Entities
 
             if (IsCheckboxChecked("quest ender"))
             {
-                String creatureQuestEnderPattern = @"new Listview\(\{template: 'quest', id: 'ends', name: LANG\.tab_ends, tabs: tabsRelated, parent: 'lkljbjkb574', data: (.+)\}\);";
+                String creatureQuestEnderPattern = @"new Listview\(\{template: 'quest', id: 'ends', name: WH.TERMS.ends, tabs: tabsRelated, parent: 'lkljbjkb574', data: (.+)\}\);";
 
                 String creatureQuestEnderJSon = Tools.ExtractJsonFromWithPattern(creatureHtml, creatureQuestEnderPattern);
                 if (creatureQuestEnderJSon != null)
@@ -366,6 +367,9 @@ namespace WowHeadParser.Entities
 
                 try
                 {
+                    //Debug.WriteLine((object)allLootData[i].modes.ToString());
+                    //Debug.WriteLine((object)allLootData[i].modes["mode"].ToString());
+                    //Debug.WriteLine(allLootData[i].modes["mode"].GetType());
                     String realItemMode = allLootData[i].modes["mode"];
                     String treatmentItemMode = realItemMode;
 
@@ -395,14 +399,18 @@ namespace WowHeadParser.Entities
 
                     currentMode = realItemMode;
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
                     foreach (String mode in modes)
                     {
+                        //Debug.WriteLine("mode: " + mode);
+                        //Debug.WriteLine(allLootData[i].id);
+                        //Debug.WriteLine((object)allLootData[i].modes.ToString());
+                        //Debug.WriteLine((float)Convert.ToDouble(allLootData[i].modes["0"]["count"]));
                         try
                         {
-                            count = (float)Convert.ToDouble(allLootData[i].modes[mode]["count"]) != -1 ? (float)Convert.ToDouble(allLootData[i].modes[mode]["count"]) : 0.0f;
-                            outof = (float)Convert.ToDouble(allLootData[i].modes[mode]["outof"]);
+                            count = (float)Convert.ToDouble(allLootData[i].modes["0"]["count"]) != -1 ? (float)Convert.ToDouble(allLootData[i].modes["0"]["count"]) : 0.0f;
+                            outof = (float)Convert.ToDouble(allLootData[i].modes["0"]["outof"]);
                             if (count != 0.0f)
                                 percent = count * 100 / outof;
                             else
@@ -493,7 +501,23 @@ namespace WowHeadParser.Entities
                         returnSql += m_creatureTemplateBuilder.ToString() + "\n";
                     }
                     break;
-                    default: // 8.0.1.28153
+                    case "8.0.1.28153":
+                    {
+                        m_creatureTemplateBuilder = new SqlBuilder("creature_template", "entry");
+                        m_creatureTemplateBuilder.SetFieldsNames("minlevel", "maxlevel", "name", "subname", "rank", "type", "family");
+
+                        m_creatureTemplateBuilder.AppendFieldsValue(m_creatureTemplateData.id, m_creatureTemplateData.minlevel, m_creatureTemplateData.maxlevel, m_creatureTemplateData.name, m_subname ?? "", m_isBoss ? "3" : "0", m_creatureTemplateData.type, m_creatureTemplateData.family);
+                        returnSql += m_creatureTemplateBuilder.ToString() + "\n";
+
+                        // models are now saved in creature_template_model as of BFA
+                        m_creatureTemplateModelBuilder = new SqlBuilder("creature_template_model", "CreatureID");
+                        m_creatureTemplateModelBuilder.SetFieldsNames("Idx", "CreatureDisplayID", "Probability");
+
+                        m_creatureTemplateModelBuilder.AppendFieldsValue(m_creatureTemplateData.id, "0", m_modelid, "1");
+                        returnSql += m_creatureTemplateModelBuilder.ToString() + "\n";
+                    }
+                    break;
+                    default: // 9.2.0.42560
                     {
                         m_creatureTemplateBuilder = new SqlBuilder("creature_template", "entry");
                         m_creatureTemplateBuilder.SetFieldsNames("minlevel", "maxlevel", "name", "subname", "rank", "type", "family");
@@ -552,7 +576,21 @@ namespace WowHeadParser.Entities
 
                 if (localeIndex != 0)
                 {
-                    m_creatureLocalesBuilder = new SqlBuilder("creature_template_locales", "entry");
+                    switch (GetVersion())
+                    {
+                        case "9.2.0.42560":
+                        {
+                            m_creatureLocalesBuilder = new SqlBuilder("creature_template_locale", "entry");
+
+                        }
+                        break;
+                        default: // 8.x and 7.x
+                        {
+                            m_creatureLocalesBuilder = new SqlBuilder("creature_template_locales", "entry");
+                        }
+                        break;
+                    }
+
                     m_creatureLocalesBuilder.SetFieldsNames("locale", "Name", "Title");
 
                     m_creatureLocalesBuilder.AppendFieldsValue(m_creatureTemplateData.id, localeIndex.ToString(), m_creatureTemplateData.name, m_subname ?? "");

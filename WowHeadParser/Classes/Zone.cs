@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using WowHeadParser.Entities;
@@ -40,12 +41,12 @@ namespace WowHeadParser
             m_timestamp = (Int32)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
         }
 
-        public void StartParsing(String zone)
+        public bool StartParsing(String zone)
         {
             Entity askedEntity = m_view.CreateNeededEntity();
 
             if (askedEntity == null)
-                return;
+                return false;
 
             ResetZone();
             m_zoneId = zone;
@@ -55,6 +56,7 @@ namespace WowHeadParser
 
             ParseZoneJson();
             StartSnifByEntity();
+            return true;
         }
 
         public String GetZoneHtmlFromWowhead(String zone)
@@ -72,7 +74,10 @@ namespace WowHeadParser
             List<Entity> entityList = m_view.CreateNeededEntity().GetIdsFromZone(m_zoneId, m_zoneHtml);
 
             if (entityList != null)
+            {
+                m_count = entityList.Count;
                 m_array.AddRange(entityList);
+            }
         }
 
         void StartSnifByEntity()
@@ -80,7 +85,9 @@ namespace WowHeadParser
             m_index = 0;
             m_parsedEntitiesCount = 0;
 
-            for (int i = 0; i < MAX_WORKER; ++i)
+            int maxWorkers = m_count > MAX_WORKER ? MAX_WORKER : m_count;
+
+            for (int i = 0; i < maxWorkers; ++i)
             {
                 m_getZoneListBackgroundWorker[i] = new BackgroundWorker();
                 m_getZoneListBackgroundWorker[i].DoWork += new DoWorkEventHandler(BackgroundWorkerProcessEntitiesList);
@@ -185,6 +192,7 @@ namespace WowHeadParser
 
         private List<Entity> m_array;
         private int m_index;
+        private int m_count;
         private int m_parsedEntitiesCount;
 
         private BackgroundWorker[] m_getZoneListBackgroundWorker;

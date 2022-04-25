@@ -33,7 +33,7 @@
             this.textBoxFrom = new System.Windows.Forms.TextBox();
             this.labelFrom = new System.Windows.Forms.Label();
             this.labelTo = new System.Windows.Forms.Label();
-            this.button1 = new System.Windows.Forms.Button();
+            this.parseBtn = new System.Windows.Forms.Button();
             this.comboBoxLocale = new System.Windows.Forms.ComboBox();
             this.timeLeftLabel = new System.Windows.Forms.Label();
             this.comboBoxEntity = new System.Windows.Forms.ComboBox();
@@ -57,10 +57,12 @@
             this.textBoxTo.Size = new System.Drawing.Size(80, 20);
             this.textBoxTo.TabIndex = 4;
             this.textBoxTo.Text = "2";
+            this.textBoxTo.TextChanged += new System.EventHandler(this.textBoxTo_TextChanged);
             // 
             // comboBoxChoice
             // 
             this.comboBoxChoice.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBoxChoice.Enabled = false;
             this.comboBoxChoice.FormattingEnabled = true;
             this.comboBoxChoice.Location = new System.Drawing.Point(118, 10);
             this.comboBoxChoice.Name = "comboBoxChoice";
@@ -71,42 +73,49 @@
             // textBoxFrom
             // 
             this.textBoxFrom.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBoxFrom.Location = new System.Drawing.Point(256, 10);
+            this.textBoxFrom.Location = new System.Drawing.Point(253, 10);
+            this.textBoxFrom.Margin = new System.Windows.Forms.Padding(0);
             this.textBoxFrom.Name = "textBoxFrom";
             this.textBoxFrom.Size = new System.Drawing.Size(80, 20);
             this.textBoxFrom.TabIndex = 3;
             this.textBoxFrom.Text = "1";
+            this.textBoxFrom.TextChanged += new System.EventHandler(this.textBoxFrom_TextChanged);
             // 
             // labelFrom
             // 
             this.labelFrom.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.labelFrom.AutoSize = true;
-            this.labelFrom.Location = new System.Drawing.Point(223, 14);
+            this.labelFrom.Location = new System.Drawing.Point(218, 13);
+            this.labelFrom.Margin = new System.Windows.Forms.Padding(0);
             this.labelFrom.Name = "labelFrom";
-            this.labelFrom.Size = new System.Drawing.Size(33, 13);
+            this.labelFrom.Size = new System.Drawing.Size(32, 13);
             this.labelFrom.TabIndex = 5;
-            this.labelFrom.Text = "From:";
+            this.labelFrom.Text = "Start:";
+            this.labelFrom.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.labelFrom.UseCompatibleTextRendering = true;
             // 
             // labelTo
             // 
             this.labelTo.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.labelTo.AutoSize = true;
-            this.labelTo.Location = new System.Drawing.Point(342, 14);
+            this.labelTo.Location = new System.Drawing.Point(335, 13);
+            this.labelTo.Margin = new System.Windows.Forms.Padding(0);
             this.labelTo.Name = "labelTo";
-            this.labelTo.Size = new System.Drawing.Size(23, 13);
+            this.labelTo.Size = new System.Drawing.Size(29, 13);
             this.labelTo.TabIndex = 6;
-            this.labelTo.Text = "To:";
+            this.labelTo.Text = "End:";
+            this.labelTo.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.labelTo.UseCompatibleTextRendering = true;
             // 
-            // button1
+            // parseBtn
             // 
-            this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.button1.Location = new System.Drawing.Point(372, 247);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(75, 23);
-            this.button1.TabIndex = 7;
-            this.button1.Text = "Parse";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.parseBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.parseBtn.Enabled = false;
+            this.parseBtn.Location = new System.Drawing.Point(372, 248);
+            this.parseBtn.Name = "parseBtn";
+            this.parseBtn.Size = new System.Drawing.Size(75, 21);
+            this.parseBtn.TabIndex = 7;
+            this.parseBtn.Text = "Parse";
+            this.parseBtn.UseVisualStyleBackColor = true;
+            this.parseBtn.Click += new System.EventHandler(this.parseBtn_Click);
             // 
             // comboBoxLocale
             // 
@@ -114,17 +123,18 @@
             this.comboBoxLocale.FormattingEnabled = true;
             this.comboBoxLocale.Location = new System.Drawing.Point(12, 248);
             this.comboBoxLocale.Name = "comboBoxLocale";
-            this.comboBoxLocale.Size = new System.Drawing.Size(80, 21);
+            this.comboBoxLocale.Size = new System.Drawing.Size(51, 21);
             this.comboBoxLocale.TabIndex = 6;
             // 
             // timeLeftLabel
             // 
-            this.timeLeftLabel.AutoSize = true;
-            this.timeLeftLabel.Location = new System.Drawing.Point(274, 252);
+            this.timeLeftLabel.Location = new System.Drawing.Point(247, 248);
             this.timeLeftLabel.Name = "timeLeftLabel";
-            this.timeLeftLabel.Size = new System.Drawing.Size(62, 13);
+            this.timeLeftLabel.Size = new System.Drawing.Size(63, 21);
             this.timeLeftLabel.TabIndex = 9;
             this.timeLeftLabel.Text = "00h00m00s";
+            this.timeLeftLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.timeLeftLabel.UseCompatibleTextRendering = true;
             // 
             // comboBoxEntity
             // 
@@ -138,12 +148,13 @@
             // 
             // label1
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(188, 252);
+            this.label1.Location = new System.Drawing.Point(157, 248);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(81, 13);
+            this.label1.Size = new System.Drawing.Size(93, 21);
             this.label1.TabIndex = 12;
             this.label1.Text = "Time remaining:";
+            this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.label1.UseCompatibleTextRendering = true;
             // 
             // leftDataGroup
             // 
@@ -161,12 +172,14 @@
             this.leftListView.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.leftListView.CheckBoxes = true;
             this.leftListView.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.None;
+            this.leftListView.HideSelection = false;
             this.leftListView.Location = new System.Drawing.Point(6, 19);
             this.leftListView.Name = "leftListView";
             this.leftListView.Size = new System.Drawing.Size(188, 152);
             this.leftListView.TabIndex = 0;
             this.leftListView.UseCompatibleStateImageBehavior = false;
             this.leftListView.View = System.Windows.Forms.View.List;
+            this.leftListView.ItemChecked += new System.Windows.Forms.ItemCheckedEventHandler(this.leftListView_ItemChecked);
             // 
             // rightDataGroup
             // 
@@ -183,12 +196,14 @@
             this.rightListView.BackColor = System.Drawing.SystemColors.Control;
             this.rightListView.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.rightListView.CheckBoxes = true;
+            this.rightListView.HideSelection = false;
             this.rightListView.Location = new System.Drawing.Point(6, 19);
             this.rightListView.Name = "rightListView";
             this.rightListView.Size = new System.Drawing.Size(188, 152);
             this.rightListView.TabIndex = 1;
             this.rightListView.UseCompatibleStateImageBehavior = false;
             this.rightListView.View = System.Windows.Forms.View.List;
+            this.rightListView.ItemChecked += new System.Windows.Forms.ItemCheckedEventHandler(this.rightListView_ItemChecked);
             // 
             // progressBar1
             // 
@@ -201,19 +216,20 @@
             // 
             // ProgressBarValue
             // 
-            this.ProgressBarValue.AutoSize = true;
-            this.ProgressBarValue.Location = new System.Drawing.Point(12, 224);
+            this.ProgressBarValue.Location = new System.Drawing.Point(12, 219);
             this.ProgressBarValue.Name = "ProgressBarValue";
             this.ProgressBarValue.RightToLeft = System.Windows.Forms.RightToLeft.No;
-            this.ProgressBarValue.Size = new System.Drawing.Size(21, 13);
+            this.ProgressBarValue.Size = new System.Drawing.Size(33, 23);
             this.ProgressBarValue.TabIndex = 8;
             this.ProgressBarValue.Text = "0%";
+            this.ProgressBarValue.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.ProgressBarValue.UseCompatibleTextRendering = true;
             // 
             // comboBoxVersion
             // 
             this.comboBoxVersion.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBoxVersion.FormattingEnabled = true;
-            this.comboBoxVersion.Location = new System.Drawing.Point(100, 248);
+            this.comboBoxVersion.Location = new System.Drawing.Point(69, 248);
             this.comboBoxVersion.Name = "comboBoxVersion";
             this.comboBoxVersion.Size = new System.Drawing.Size(82, 21);
             this.comboBoxVersion.TabIndex = 15;
@@ -237,7 +253,7 @@
             this.Controls.Add(this.comboBoxChoice);
             this.Controls.Add(this.textBoxTo);
             this.Controls.Add(this.progressBar1);
-            this.Controls.Add(this.button1);
+            this.Controls.Add(this.parseBtn);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Name = "MainWindow";
             this.Text = "Wowhead Parser";
@@ -255,7 +271,7 @@
         private System.Windows.Forms.TextBox textBoxFrom;
         private System.Windows.Forms.Label labelFrom;
         private System.Windows.Forms.Label labelTo;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button parseBtn;
         private System.Windows.Forms.ComboBox comboBoxLocale;
         private System.Windows.Forms.Label timeLeftLabel;
         private System.Windows.Forms.ComboBox comboBoxEntity;

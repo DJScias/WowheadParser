@@ -39,7 +39,6 @@ namespace WowHeadParser.Entities
             m_builderSerieWithoutPrevious.SetFieldsNames("ExclusiveGroup");
 
             m_builderRequiredTeam = new SqlBuilder("quest_template", "id", SqlQueryType.Update);
-            m_builderRequiredTeam.SetFieldsNames("requiredTeam");
 
             m_builderRequiredClass = new SqlBuilder("quest_template_addon", "id", SqlQueryType.Update);
             m_builderRequiredClass.SetFieldsNames("AllowableClasses");
@@ -57,8 +56,8 @@ namespace WowHeadParser.Entities
 
         public override List<Entity> GetIdsFromZone(String zoneId, String zoneHtml)
         {
-            String pattern = @"new Listview\({template: 'quest', id: 'quests', name: LANG\.tab_quests, tabs: tabsRelated, parent: 'lkljbjkb574', computeDataFunc: Listview\.funcBox\.initQuestFilter, onAfterCreate: Listview\.funcBox\.addQuestIndicator,(?: note: WH\.sprintf\(LANG\.lvnote_zonequests, [0-9]+, [0-9]+, '[a-zA-ZÉèéêîÎ’'\- ]+', [0-9]+\),)? data: (.+)}\);";
-            String creatureJSon = Tools.ExtractJsonFromWithPattern(zoneHtml, pattern);
+            String pattern = @"new Listview\(\{template: 'quest', id: 'quests', name: WH.TERMS.quests, tabs: tabsRelated, parent: 'lkljbjkb574',(.*)data: (.+)\}\);";
+            String creatureJSon = Tools.ExtractJsonFromWithPattern(zoneHtml, pattern, 1);
 
             List<Entity> tempArray = new List<Entity>();
             if (creatureJSon != null)
@@ -133,6 +132,7 @@ namespace WowHeadParser.Entities
                 bool isHorde = questHtml.Contains(@"Side: [span class=icon-horde]Horde[\/span]");
 
                 SetTeam(isAlliance, isHorde);
+                optionSelected = true;
             }
 
             if (optionSelected)
@@ -228,6 +228,7 @@ namespace WowHeadParser.Entities
 
                         String href = hrefAttr.Value;
                         String questId = href.Substring(7);
+                        questId = questId.Substring(0, questId.LastIndexOf("/"));
 
                         questInSerieByStep[currentStep].Add(questId);
                     }
@@ -259,9 +260,25 @@ namespace WowHeadParser.Entities
 
         public void SetTeam(bool isAlliance, bool isHorde)
         {
-            Int32 team = isAlliance ? 0 : isHorde ? 1 : -1;
+            switch (GetVersion())
+            {
+                case "9.2.0.42560":
+                {
+                    ulong team = isAlliance ? 6130900294268439629 : isHorde ? 18446744073709551615 : 0;
 
-            m_builderRequiredTeam.AppendFieldsValue(m_data.id, team);
+                    m_builderRequiredTeam.SetFieldsNames("AllowableRaces");
+                    m_builderRequiredTeam.AppendFieldsValue(m_data.id, team);
+                }
+                break;
+                default: // 8.x and 7.x
+                {
+                    Int32 team = isAlliance ? 0 : isHorde ? 1 : -1;
+
+                    m_builderRequiredTeam.SetFieldsNames("requiredTeam");
+                    m_builderRequiredTeam.AppendFieldsValue(m_data.id, team);
+                }
+                break;
+            }
         }
 
         public void SetClassRequired(List<String> classIds)

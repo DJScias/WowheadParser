@@ -15,6 +15,7 @@ The supported WoW versions are:
 
 - 7.3.5.26972 (Legion)
 - 8.0.1.28153 (BFA)
+- 9.2.0.42560 (SL)
 
 ## Screenshots
 Design is not final *(is it ever?)*.

@@ -27,10 +27,14 @@ namespace WowHeadParser
             m_lastEstimateTime = 0;
         }
 
-        public void StartParsing(int from, int to)
+        public bool StartParsing(int from, int to)
         {
             if (from > to)
-                return;
+            {
+                System.Windows.Forms.MessageBox.Show("End ID of Range should be higher than start.", "Error!");
+                return false;
+            }
+            
 
             m_timestamp = Tools.GetUnixTimestamp();
 
@@ -39,6 +43,7 @@ namespace WowHeadParser
             m_entityTodoCount = to - from + 1; // + 1 car le premier est compris
 
             StartSniffByEntity();
+            return true;
         }
 
         void StartSniffByEntity()
@@ -75,6 +80,9 @@ namespace WowHeadParser
                 {
                     String requestText = "\n\n" + entity.GetSQLRequest();
                     requestText += requestText != "" ? "\n" : "";
+                    if (requestText.Equals("\n\n\n"))
+                        return;
+
                     lock (locker)
                     { // AppendAllTexts is not thread safe, by using a lock it will be
                         Directory.CreateDirectory(Path.GetDirectoryName(m_fileName));

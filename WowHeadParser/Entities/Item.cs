@@ -95,7 +95,7 @@ namespace WowHeadParser.Entities
 
             if (IsCheckboxChecked("create item"))
             {
-                String itemSpellPattern = @"new Listview\(\{template: 'spell', id: 'reagent-for', name: LANG\.tab_reagentfor, tabs: tabsRelated, parent: 'lkljbjkb574',.*(?:\n)?.*data: (.+)\}\);";
+                String itemSpellPattern = @"new Listview\(\{\n* *template: 'spell',\n* *id: 'reagent-for',\n* *name: WH.TERMS.reagentfor,\n* *tabs: 'tabsRelated',\n* *parent: 'lkljbjkb574',\n* *data: (.+),\n\}\);";
 
                 String itemSpellJSon = Tools.ExtractJsonFromWithPattern(itemHtml, itemSpellPattern);
                 if (itemSpellJSon != null)
@@ -104,7 +104,7 @@ namespace WowHeadParser.Entities
                     optionSelected = true;
                 }
 
-                String itemCreatePattern = @"new Listview\(\{template: 'item', id: 'creates', name: LANG\.tab_creates, tabs: tabsRelated, parent: 'lkljbjkb574', sort:\['name'\],.*(?:\n)?.*data: (.+)}\);";
+                String itemCreatePattern = @"new Listview\(\{\n* *template: 'item',\n* *id: 'creates',\n* *name: WH.TERMS.creates,\n* *tabs: 'tabsRelated',\n* *parent: 'lkljbjkb574',\n* *sort:\['name'\],.*(?:\n)?.*data: (.+),\n\}\);";
 
                 String itemCreateJSon = Tools.ExtractJsonFromWithPattern(itemHtml, itemCreatePattern);
                 if (itemCreateJSon != null)
@@ -116,7 +116,7 @@ namespace WowHeadParser.Entities
 
             if (IsCheckboxChecked("loot"))
             {
-                String itemLootTemplatePattern = @"new Listview\(\{template: 'item', id: 'contains', name: LANG\.tab_contains, tabs: tabsRelated, parent: 'lkljbjkb574',\n* *extraCols: \[Listview\.extraCols\.count, Listview.extraCols.percent\], sort:\['-percent', 'name'\],\n* *computeDataFunc: Listview\.funcBox\.initLootTable, note: WH\.sprintf\(LANG\.lvnote_itemopening, [0-9]+\),\n* *_totalCount: ([0-9]+), data: (.+)\}\);";
+                String itemLootTemplatePattern = @"new Listview\(\{\n* *template: 'item',\n* *id: 'contains',\n* *name: WH.TERMS.contains,\n* *tabs: 'tabsRelated',\n* *parent: 'lkljbjkb574',\n* *extraCols: \[Listview.extraCols.count, Listview.extraCols.percent\],\n* *sort:\['noteworthy', '-percent', 'name'\],\n* *computeDataFunc: Listview.funcBox.initLootTable,\n* *note: WH.sprintf\(WH.TERMS.itemopened_format, [0-9]+\),\n* *_totalCount: ([0-9]+),\n* *data: (.+),\n\}\);";
 
                 String lootMaxCountStr = Tools.ExtractJsonFromWithPattern(itemHtml, itemLootTemplatePattern, 0);
                 m_lootMaxCount = lootMaxCountStr != null ? Int32.Parse(lootMaxCountStr) : 0;
@@ -130,7 +130,7 @@ namespace WowHeadParser.Entities
 
             if (IsCheckboxChecked("dropped by"))
             {
-                String itemDroppedByPattern = @"new Listview\(\{template: 'npc', id: 'dropped-by', name: LANG\.tab_droppedby, tabs: tabsRelated, parent: 'lkljbjkb574',\n* *hiddenCols: \['type'\], extraCols: \[Listview.extraCols.count, Listview.extraCols.percent\], sort:\['-percent', '-count', 'name'\],\n* *computeDataFunc: Listview.funcBox.initLootTable, data: (.+)}\);";
+                String itemDroppedByPattern = @"new Listview\(\{\n* *template: 'npc',\n* *id: 'dropped-by',\n* *name: WH.TERMS.droppedby,\n* *tabs: 'tabsRelated',\n* *parent: 'lkljbjkb574',\n* *hiddenCols: \['type'\],\n* *extraCols: \[Listview.extraCols.count, Listview.extraCols.percent, Listview.extraCols.popularity\],\n* *sort: \['-percent', '-count', 'name'\],\n* *computeDataFunc: Listview.funcBox.initLootTable,\n* *data: (.+),\n\}\);";
 
                 String itemDroppedByJson = Tools.ExtractJsonFromWithPattern(itemHtml, itemDroppedByPattern);
                 if (itemDroppedByJson != null)
@@ -177,8 +177,22 @@ namespace WowHeadParser.Entities
                         case 10: locale = "itIT"; break;
                     }
 
-                    m_itemLocalesBuilder.SetFieldsNames("Name_" + locale);
-                    m_itemLocalesBuilder.AppendFieldsValue(m_data.id, m_data.name.Substring(1) ?? "");
+                    switch (GetVersion())
+                    {
+                        case "9.2.0.42560":
+                        {
+                            m_itemLocalesBuilder.SetFieldsNames("locale", "Description_lang", "Display3_lang", "Display2_lang", "Display1_lang", "Display_lang");
+                            m_itemLocalesBuilder.AppendFieldsValue(m_data.id, locale, "", "", "", "", m_data.name.Substring(1) ?? "");
+                        }
+                        break;
+                        default: // 8.x and 7.x
+                        {
+                            m_itemLocalesBuilder.SetFieldsNames("Name_" + locale);
+                            m_itemLocalesBuilder.AppendFieldsValue(m_data.id, m_data.name.Substring(1) ?? "");
+                        }
+                        break;
+                    }
+
                     returnSql += m_itemLocalesBuilder.ToString() + "\n";
                 }
             }
@@ -186,6 +200,7 @@ namespace WowHeadParser.Entities
             if (IsCheckboxChecked("create item") && m_itemCreateItemDatas != null)
             {
                 m_spellLootTemplateBuilder = new SqlBuilder("spell_loot_template", "entry", SqlQueryType.InsertIgnore);
+
                 m_spellLootTemplateBuilder.SetFieldsNames("Item", "Reference", "Chance", "QuestRequired", "LootMode", "GroupId", "MinCount", "MaxCount", "Comment");
 
                 foreach (ItemCreateItemParsing itemLootData in m_itemCreateItemDatas)
@@ -233,14 +248,40 @@ namespace WowHeadParser.Entities
             if (IsCheckboxChecked("dropped by") && m_itemDroppedByDatas != null)
             {
                 m_itemDroppedByBuilder = new SqlBuilder("creature_loot_template", "entry", SqlQueryType.InsertIgnore);
-                m_itemDroppedByBuilder.SetFieldsNames("item", "ChanceOrQuestChance", "lootmode", "groupid", "mincountOrRef", "maxcount", "itemBonuses");
+
+                switch (GetVersion())
+                {
+                    case "9.2.0.42560":
+                    {
+                        m_itemDroppedByBuilder.SetFieldsNames("Item", "Chance", "LootMode", "GroupId", "MinCount", "MaxCount");
+                    }
+                    break;
+                    default: // 8.x and 7.x
+                    {
+                        m_itemDroppedByBuilder.SetFieldsNames("item", "ChanceOrQuestChance", "lootmode", "groupid", "mincountOrRef", "maxcount", "itemBonuses");
+                    }
+                    break;
+                }
+            
 
                 foreach (ItemDroppedByTemplateParsing itemDroppedByData in m_itemDroppedByDatas)
                 {
                     float percent = ((float)itemDroppedByData.count / (float)itemDroppedByData.outof) * 100.0f;
                     String percentStr = Tools.NormalizeFloat(percent);
 
-                    m_itemDroppedByBuilder.AppendFieldsValue(itemDroppedByData.id, m_data.id, percentStr, 1, 0, "1", "1", "");
+                    switch (GetVersion())
+                    {
+                        case "9.2.0.42560":
+                        {
+                            m_itemDroppedByBuilder.AppendFieldsValue(itemDroppedByData.id, m_data.id, percentStr, 1, 0, "1", "1");
+                        }
+                        break;
+                        default: // 8.x and 7.x
+                        {
+                            m_itemDroppedByBuilder.AppendFieldsValue(itemDroppedByData.id, m_data.id, percentStr, 1, 0, "1", "1", "");
+                        }
+                        break;
+                    }
                 }
 
                 returnSql += "DELETE FROM creature_loot_template WHERE item = " + m_data.id + ";\n";

@@ -3,6 +3,7 @@
  */
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Windows.Forms;
 using WowHeadParser.Entities;
@@ -51,6 +52,7 @@ namespace WowHeadParser
 
             comboBoxChoice.SelectedIndex = 0;
 
+            comboBoxVersion.Items.Add("9.2.0.42560");
             comboBoxVersion.Items.Add("8.0.1.28153");
             comboBoxVersion.Items.Add("7.3.5.26972");
             comboBoxVersion.SelectedIndex = 0;
@@ -69,7 +71,7 @@ namespace WowHeadParser
                     comboBoxLocale.SelectedIndex = i;
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void parseBtn_Click(object sender, EventArgs e)
         {
             String selectedLocale = comboBoxLocale.Items[comboBoxLocale.SelectedIndex].ToString();
             String selectedVersion = comboBoxVersion.Items[comboBoxVersion.SelectedIndex].ToString();
@@ -96,14 +98,23 @@ namespace WowHeadParser
             ids = new List<String>(textBoxFrom.Text.Split(' '));
             m_optionName = "_" + comboBoxEntity.Items[comboBoxEntity.SelectedIndex].ToString();
             m_fileName = Tools.GetFileNameForCurrentTime(m_optionName);
-            StartParsing();
-
-            SetStartButtonEnableState(false);
+            if (StartParsing())
+                SetStartButtonEnableState(false);
+            else
+                SetStartButtonEnableState(true);
+         
         }
 
-        public void StartParsing()
+        public bool StartParsing()
         {
+            Boolean success = false;
             setProgressBar(0);
+            if (comboBoxEntity.SelectedIndex == 0 || comboBoxEntity.SelectedIndex == 5)
+            {
+                System.Windows.Forms.MessageBox.Show("Not implemented.", "Error!");
+                return success;
+            }
+
             switch (comboBoxChoice.SelectedIndex)
             {
                 case 0:
@@ -111,7 +122,7 @@ namespace WowHeadParser
                     int firstId = Int32.Parse(ids[currentId]);
 
                     Range range = new Range(this, m_fileName, m_optionName);
-                    range.StartParsing(firstId, firstId);
+                    success = range.StartParsing(firstId, firstId);
 
                     break;
                 }
@@ -121,26 +132,32 @@ namespace WowHeadParser
                     int lastId = Int32.Parse(textBoxTo.Text);
 
                     Range range = new Range(this, m_fileName, m_optionName);
-                    range.StartParsing(firstId, lastId);
+                    success = range.StartParsing(firstId, lastId);
 
                     break;
                 }
                 case 2:
                 {
                     Zone zone = new Zone(this, m_optionName);
-                    zone.StartParsing(ids[currentId]);
+                    success = zone.StartParsing(ids[currentId]);
+
                     break;
                 }
             }
+
+            return success;
         }
 
         public void SetStartButtonEnableState(bool state)
         {
-            button1.Enabled = state;
+            parseBtn.Enabled = state;
         }
 
         public void setProgressBar(int progress)
         {
+            if (progress < 0)
+                progress = 0;
+
             this.progressBar1.Value = progress;
             this.ProgressBarValue.Text = progress + "%";
         }
@@ -182,9 +199,16 @@ namespace WowHeadParser
         private void comboBoxChoice_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (comboBoxChoice.SelectedIndex == 1)
+            {
+                labelFrom.Text = "Start:";
                 HideToTextbox(false);
+            }
+                
             else
+            {
+                labelFrom.Text = "ID:";
                 HideToTextbox(true);
+            }  
         }
 
         private void HideToTextbox(bool hide)
@@ -232,6 +256,7 @@ namespace WowHeadParser
             leftListView.Clear();
             rightListView.Clear();
             HideDataGroups(true);
+            comboBoxChoice.Enabled = true;
 
             switch (comboBoxEntity.SelectedIndex)
             {
@@ -353,5 +378,44 @@ namespace WowHeadParser
         private List<String> ids;
         private String m_fileName;
         private String m_optionName;
+
+        public void CheckParsable()
+        {
+            Boolean options = false;
+            for (int i = 0; i < leftListView.Items.Count; ++i)
+                if (leftListView.Items[i].Checked)
+                    options = true;
+
+            for (int i = 0; i < rightListView.Items.Count; ++i)
+                if (rightListView.Items[i].Checked)
+                    options = true;
+
+            if (options && !String.IsNullOrEmpty(textBoxFrom.Text) && (comboBoxChoice.SelectedIndex == 0 || comboBoxChoice.SelectedIndex == 2))
+                parseBtn.Enabled = true;
+            else if (options && !String.IsNullOrEmpty(textBoxFrom.Text) && !String.IsNullOrEmpty(textBoxTo.Text) && comboBoxChoice.SelectedIndex == 1)
+                parseBtn.Enabled = true;
+            else
+                parseBtn.Enabled = false;
+        }
+
+        private void leftListView_ItemChecked(object sender, ItemCheckedEventArgs e)
+        {
+            CheckParsable();
+        }
+
+        private void rightListView_ItemChecked(object sender, ItemCheckedEventArgs e)
+        {
+            CheckParsable();
+        }
+
+        private void textBoxFrom_TextChanged(object sender, EventArgs e)
+        {
+            CheckParsable();
+        }
+
+        private void textBoxTo_TextChanged(object sender, EventArgs e)
+        {
+            CheckParsable();
+        }
     }
 }

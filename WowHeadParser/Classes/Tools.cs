@@ -121,16 +121,22 @@ namespace WowHeadParser
         public String Name;
         public UInt32 MaxQty;
         public UInt32 MaxEarnablePerWeek;
-        public UInt32 Flags;
         public String Description;
         public Byte CategoryID;
         public Byte SpellCategory;
         public Byte Quality;
         public UInt32 InventoryIconFileDataID;
         public UInt32 SpellWeight;
+        public UInt32 FactionID;
+        public Byte ItemGroupSoundsID;
+        public Byte XpQuestDifficulty;
+        public UInt32 AwardConditionID;
+        public UInt32 MaxQtyWorldStateID;
+        public UInt32 Flags0;
+        public UInt32 Flags1;
 
-        public bool HasPrecision()   { return (Flags & (int)CurrencyFlags.CURRENCY_FLAG_HIGH_PRECISION) != 0; }
-        public bool HasSeasonCount() { return (Flags & (int)CurrencyFlags.CURRENCY_FLAG_HAS_SEASON_COUNT) != 0; }
+        public bool HasPrecision()   { return (Flags0 & (int)CurrencyFlags.CURRENCY_FLAG_HIGH_PRECISION) != 0; }
+        public bool HasSeasonCount() { return (Flags0 & (int)CurrencyFlags.CURRENCY_FLAG_HAS_SEASON_COUNT) != 0; }
         public float GetPrecision()  { return HasPrecision() ? 100.0f : 1.0f; }
     };
 
@@ -302,15 +308,21 @@ namespace WowHeadParser
                 int index = 0;
                 currencyTemplate.ID                         = Convert.ToUInt32(values[index++]);
                 currencyTemplate.Name                       = values[index++];
-                currencyTemplate.MaxQty                     = Convert.ToUInt32(values[index++]);
-                currencyTemplate.MaxEarnablePerWeek         = Convert.ToUInt32(values[index++]);
-                currencyTemplate.Flags                      = Convert.ToUInt32(values[index++]);
                 currencyTemplate.Description                = values[index++];
                 currencyTemplate.CategoryID                 = Convert.ToByte(values[index++]);
-                currencyTemplate.SpellCategory              = Convert.ToByte(values[index++]);
-                currencyTemplate.Quality                    = Convert.ToByte(values[index++]);
                 currencyTemplate.InventoryIconFileDataID    = Convert.ToUInt32(values[index++]);
-                //currencyTemplate.SpellWeight                = Convert.ToUInt32(values[index++]);
+                currencyTemplate.SpellWeight                = Convert.ToUInt32(values[index++]);
+                currencyTemplate.SpellCategory              = Convert.ToByte(values[index++]);
+                currencyTemplate.MaxQty                     = Convert.ToUInt32(values[index++]);
+                currencyTemplate.MaxEarnablePerWeek         = Convert.ToUInt32(values[index++]);
+                currencyTemplate.Quality                    = Convert.ToByte(values[index++]);
+                currencyTemplate.FactionID                  = Convert.ToUInt32(values[index++]);
+                currencyTemplate.ItemGroupSoundsID          = Convert.ToByte(values[index++]);
+                currencyTemplate.XpQuestDifficulty          = Convert.ToByte(values[index++]);
+                currencyTemplate.AwardConditionID           = Convert.ToUInt32(values[index++]);
+                currencyTemplate.MaxQtyWorldStateID         = Convert.ToUInt32(values[index++]);
+                currencyTemplate.Flags0                     = Convert.ToUInt32(values[index++]);
+                currencyTemplate.Flags1                     = Convert.ToUInt32(values[index++]);
 
                 m_currencyTemplate.Add(currencyTemplate.ID, currencyTemplate);
             }
@@ -324,6 +336,8 @@ namespace WowHeadParser
             m_itemExtendedCost = new List<ItemExtendedCostEntry>();
 
             List<String> allLines = new List<String>(File.ReadAllLines("Ressources/ItemExtendedCost.db2.csv"));
+
+            allLines.RemoveAt(0);
 
             foreach (String line in allLines)
             {
@@ -340,26 +354,25 @@ namespace WowHeadParser
                 extendedCost.RequiredCurrencyCount          = new List<UInt32>();
 
                 extendedCost.ID                             = intValues[0];
+                extendedCost.RequiredPersonalArenaRating    = (UInt16)intValues[1];
+                extendedCost.RequiredArenaSlot              = (byte)intValues[2];
+                extendedCost.RequirementFlags               = (byte)intValues[3];
+                extendedCost.RequiredFactionId              = (byte)intValues[4];
+                extendedCost.RequiredFactionStanding        = (byte)intValues[5];
+                extendedCost.RequiredAchievement            = (byte)intValues[6];
+
 
                 for (int i = 0; i < 5; ++i)
-                    extendedCost.RequiredItem.Add(intValues[1 + i]);
+                    extendedCost.RequiredItem.Add(intValues[7 + i]);
 
                 for (int i = 0; i < 5; ++i)
-                    extendedCost.RequiredCurrencyCount.Add(intValues[6 + i]);
-
-                for (int i = 0; i < 5; ++i)
-                    extendedCost.RequiredItemCount.Add((UInt16)intValues[11 + i]);
-
-                extendedCost.RequiredPersonalArenaRating    = (UInt16)intValues[16];
+                    extendedCost.RequiredItemCount.Add((UInt16)intValues[12 + i]);
 
                 for (int i = 0; i < 5; ++i)
                     extendedCost.RequiredCurrency.Add((UInt16)intValues[17 + i]);
 
-                extendedCost.RequiredArenaSlot          = (byte)intValues[22];
-                extendedCost.RequiredFactionId          = (byte)intValues[23];
-                extendedCost.RequiredFactionStanding    = (byte)intValues[24];
-                extendedCost.RequirementFlags           = (byte)intValues[25];
-                extendedCost.RequiredAchievement        = (byte)intValues[26];
+                for (int i = 0; i < 5; ++i)
+                    extendedCost.RequiredCurrencyCount.Add(intValues[22 + i]);
 
                 m_itemExtendedCost.Add(extendedCost);
             }
@@ -449,10 +462,10 @@ namespace WowHeadParser
                 playerCondition.PrevQuestID = new List<Int32>();
 
                 playerCondition.ID              = Convert.ToInt32(values[0]);
-                playerCondition.PrevQuestLogic  = Convert.ToInt32(values[36]);
+                playerCondition.PrevQuestLogic  = Convert.ToInt32(values[13]);
 
                 for (int i = 0; i < 4; ++i)
-                    playerCondition.PrevQuestID.Add(Convert.ToInt32(values[37 + i]));
+                    playerCondition.PrevQuestID.Add(Convert.ToInt32(values[75 + i]));
 
                 m_playerConditions.Add(playerCondition);
             }

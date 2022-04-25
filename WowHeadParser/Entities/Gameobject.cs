@@ -56,8 +56,8 @@ namespace WowHeadParser.Entities
 
         public override List<Entity> GetIdsFromZone(String zoneId, String zoneHtml)
         {
-            String pattern = @"new Listview\(\{template: 'object', id: 'objects', name: LANG.tab_objects, tabs: tabsRelated, parent: 'lkljbjkb574', note: WH.sprintf\(LANG\.lvnote_filterresults, '\/objects\?filter=cr=1;crs=" + zoneId + @";crv=0'\), data: (.+)\}\);";
-            String gameobjectJSon = Tools.ExtractJsonFromWithPattern(zoneHtml, pattern);
+            String pattern = @"new Listview\(\{template: 'object', id: 'objects', name: WH.TERMS.objects, tabs: tabsRelated, parent: 'lkljbjkb574',(.*)data: (.+)\}\);";
+            String gameobjectJSon = Tools.ExtractJsonFromWithPattern(zoneHtml, pattern, 1);
 
             List<Entity> tempArray = new List<Entity>();
             if (gameobjectJSon != null)
@@ -97,8 +97,8 @@ namespace WowHeadParser.Entities
 
             if (IsCheckboxChecked("loot"))
             {
-                String gameobjectLootPattern = @"new Listview\(\{template: 'item', id: 'contains', name: LANG.tab_contains, tabs: tabsRelated, parent: 'lkljbjkb574', extraCols: \[Listview.extraCols.count, Listview.extraCols.percent(?:, Listview\.extraCols\.mode)?\], sort:\['-percent', 'name'\], _totalCount: [0-9]+, computeDataFunc: Listview.funcBox.initLootTable, onAfterCreate: Listview.funcBox.addModeIndicator, data: (.+)\}\);";
-                String gameobjectLootCurrencyPattern = @"new Listview\({template: 'currency', id: 'contains-currency', name: LANG\.tab_currencies, tabs: tabsRelated, parent: 'lkljbjkb574', extraCols: \[Listview\.extraCols\.count, Listview\.extraCols\.percent\], sort:\['-percent', 'name'\], _totalCount: [0-9]+, computeDataFunc: Listview\.funcBox\.initLootTable, onAfterCreate: Listview\.funcBox\.addModeIndicator, data: (.+)}\);";
+                String gameobjectLootPattern = @"new Listview\(\{template: 'item', id: 'contains', name: WH.TERMS.contains,.*data:(.+)}\);";
+                String gameobjectLootCurrencyPattern = @"new Listview\({template: 'currency', id: 'contains-currency', name: WH.TERMS.currencies,.*data:(.+)}\);";
 
                 String gameobjectLootItemJSon = Tools.ExtractJsonFromWithPattern(gameobjectHtml, gameobjectLootPattern);
                 String gameobjectLootCurrencyJSon = Tools.ExtractJsonFromWithPattern(gameobjectHtml, gameobjectLootCurrencyPattern);
@@ -113,7 +113,7 @@ namespace WowHeadParser.Entities
 
             if (IsCheckboxChecked("herbalism"))
             {       
-                String gameobjectHerboPattern = @"new Listview\(\{template: 'item', id: 'herbalism', name: LANG.tab_herbalism, tabs: tabsRelated, parent: 'lkljbjkb574', extraCols: \[Listview.extraCols.count, Listview.extraCols.percent\], sort:\['-percent', 'name'\], computeDataFunc: Listview.funcBox.initLootTable, note: WH\.sprintf\(LANG.lvnote_objectherbgathering, [0-9]+\), _totalCount: ([0-9]+), data: (.+)\}\);";
+                String gameobjectHerboPattern = @"new Listview\(\{template: 'item', id: 'herbalism',.*_totalCount: ([0-9]+),.*data: (.+)\}\);";
 
                 String gameobjectHerbalismTotalCount = Tools.ExtractJsonFromWithPattern(gameobjectHtml, gameobjectHerboPattern, 0);
                 String gameobjectHerbalismJSon = Tools.ExtractJsonFromWithPattern(gameobjectHtml, gameobjectHerboPattern, 1);
@@ -127,7 +127,7 @@ namespace WowHeadParser.Entities
 
             if (IsCheckboxChecked("mining"))
             {
-                String gameobjectMiningPattern = @"new Listview\(\{template: 'item', id: 'mining', name: LANG\.tab_mining, tabs: tabsRelated, parent: 'lkljbjkb574', extraCols: \[Listview\.extraCols\.count, Listview\.extraCols\.percent], sort:\['-percent', 'name'\], computeDataFunc: Listview\.funcBox\.initLootTable, note: WH\.sprintf\(LANG\.lvnote_objectmining, [0-9]+\), _totalCount: ([0-9]+), data: (.+)\}\);";
+                String gameobjectMiningPattern = @"new Listview\(\{template: 'item', id: 'mining',.*_totalCount: ([0-9]+),.*data: (.+)\}\);";
 
                 String gameobjectMiningTotalCount = Tools.ExtractJsonFromWithPattern(gameobjectHtml, gameobjectMiningPattern, 0);
                 String gameobjectMiningJSon = Tools.ExtractJsonFromWithPattern(gameobjectHtml, gameobjectMiningPattern, 1);
