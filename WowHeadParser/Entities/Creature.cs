@@ -8,7 +8,6 @@ using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 using static WowHeadParser.MainWindow;
 using System.Windows.Forms;
-using System.Diagnostics;
 
 namespace WowHeadParser.Entities
 {
@@ -367,9 +366,6 @@ namespace WowHeadParser.Entities
 
                 try
                 {
-                    //Debug.WriteLine((object)allLootData[i].modes.ToString());
-                    //Debug.WriteLine((object)allLootData[i].modes["mode"].ToString());
-                    //Debug.WriteLine(allLootData[i].modes["mode"].GetType());
                     String realItemMode = allLootData[i].modes["mode"];
                     String treatmentItemMode = realItemMode;
 
@@ -403,10 +399,6 @@ namespace WowHeadParser.Entities
                 {
                     foreach (String mode in modes)
                     {
-                        //Debug.WriteLine("mode: " + mode);
-                        //Debug.WriteLine(allLootData[i].id);
-                        //Debug.WriteLine((object)allLootData[i].modes.ToString());
-                        //Debug.WriteLine((float)Convert.ToDouble(allLootData[i].modes["0"]["count"]));
                         try
                         {
                             count = (float)Convert.ToDouble(allLootData[i].modes["0"]["count"]) != -1 ? (float)Convert.ToDouble(allLootData[i].modes["0"]["count"]) : 0.0f;

@@ -84,10 +84,10 @@
             // labelFrom
             // 
             this.labelFrom.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.labelFrom.Location = new System.Drawing.Point(218, 13);
+            this.labelFrom.Location = new System.Drawing.Point(218, 10);
             this.labelFrom.Margin = new System.Windows.Forms.Padding(0);
             this.labelFrom.Name = "labelFrom";
-            this.labelFrom.Size = new System.Drawing.Size(32, 13);
+            this.labelFrom.Size = new System.Drawing.Size(32, 20);
             this.labelFrom.TabIndex = 5;
             this.labelFrom.Text = "Start:";
             this.labelFrom.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -96,10 +96,10 @@
             // labelTo
             // 
             this.labelTo.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.labelTo.Location = new System.Drawing.Point(335, 13);
+            this.labelTo.Location = new System.Drawing.Point(335, 10);
             this.labelTo.Margin = new System.Windows.Forms.Padding(0);
             this.labelTo.Name = "labelTo";
-            this.labelTo.Size = new System.Drawing.Size(29, 13);
+            this.labelTo.Size = new System.Drawing.Size(29, 20);
             this.labelTo.TabIndex = 6;
             this.labelTo.Text = "End:";
             this.labelTo.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
