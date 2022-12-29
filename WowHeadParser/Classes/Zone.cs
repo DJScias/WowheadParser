@@ -6,13 +6,16 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using WowHeadParser.Entities;
 
 namespace WowHeadParser
 {
     class Zone
     {
-        const int MAX_WORKER = 50;
+        const int MAX_WORKER = 20;
+        Queue<string> _writeQueue = new Queue<string>();
+        Task _parseTask;
 
         public Zone(MainWindow view, String optionName)
         {
@@ -38,6 +41,34 @@ namespace WowHeadParser
             m_timestamp = Tools.GetUnixTimestamp();
             m_fileName = Tools.GetFileNameForCurrentTime(m_optionName);
             m_timestamp = (Int32)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
+
+            FileInfo fi = new FileInfo(m_fileName);
+
+            if (!Directory.Exists(fi.DirectoryName))
+                Directory.CreateDirectory(fi.DirectoryName);
+
+            if (!File.Exists(m_fileName))
+                File.Create(m_fileName);
+
+            if (_parseTask == null)
+            {
+                _parseTask = new Task(async () =>
+                {
+                    while (true)
+                    {
+                        while (_writeQueue.Any())
+                        {
+                            var requestText = _writeQueue.Dequeue();
+
+                            if (!string.IsNullOrEmpty(requestText))
+                                File.AppendAllText(m_fileName, requestText);
+                        }
+
+                        await Task.Delay(100);
+                    }
+                });
+                _parseTask.Start();
+            }
         }
 
         public bool StartParsing(String zone)
@@ -146,12 +177,22 @@ namespace WowHeadParser
         void AppendAllEntitiesToSql()
         {
             int tempCount = 0;
+
+
             foreach (Entity entity in m_array)
             {
-                Console.WriteLine("Doing entity n°" + tempCount++);
-                String requestText = entity.GetSQLRequest();
-                requestText += requestText != "" ? "\n" : "";
-                File.AppendAllText(m_fileName, entity.GetSQLRequest());
+                try
+                {
+                    Console.WriteLine("Doing entity n°" + tempCount++);
+                    String requestText = entity.GetSQLRequest();
+                    requestText += requestText != "" ? "\n" : "";
+                    _writeQueue.Enqueue(requestText);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                    Console.WriteLine(ex.StackTrace);
+                }
             }
 
             Console.WriteLine("Elapsed Time : " + ((Int32)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds - m_timestamp));

@@ -302,29 +302,42 @@ namespace WowHeadParser
 
             foreach (String line in allLines)
             {
-                CurrencyTypesEntry currencyTemplate = new CurrencyTypesEntry();
-                String[] values = line.Split(',');
+                try
+                {
+                    CurrencyTypesEntry currencyTemplate = new CurrencyTypesEntry();
+                    string[] values =  Regex.Split(line, "[,]{1}(?=(?:[^\"]*\"[^\"]*\")*(?![^\"]*\"))"); // account for lines with commas in the quoted text
 
-                int index = 0;
-                currencyTemplate.ID                         = Convert.ToUInt32(values[index++]);
-                currencyTemplate.Name                       = values[index++];
-                currencyTemplate.Description                = values[index++];
-                currencyTemplate.CategoryID                 = Convert.ToByte(values[index++]);
-                currencyTemplate.InventoryIconFileDataID    = Convert.ToUInt32(values[index++]);
-                currencyTemplate.SpellWeight                = Convert.ToUInt32(values[index++]);
-                currencyTemplate.SpellCategory              = Convert.ToByte(values[index++]);
-                currencyTemplate.MaxQty                     = Convert.ToUInt32(values[index++]);
-                currencyTemplate.MaxEarnablePerWeek         = Convert.ToUInt32(values[index++]);
-                currencyTemplate.Quality                    = Convert.ToByte(values[index++]);
-                currencyTemplate.FactionID                  = Convert.ToUInt32(values[index++]);
-                currencyTemplate.ItemGroupSoundsID          = Convert.ToByte(values[index++]);
-                currencyTemplate.XpQuestDifficulty          = Convert.ToByte(values[index++]);
-                currencyTemplate.AwardConditionID           = Convert.ToUInt32(values[index++]);
-                currencyTemplate.MaxQtyWorldStateID         = Convert.ToUInt32(values[index++]);
-                currencyTemplate.Flags0                     = Convert.ToUInt32(values[index++]);
-                currencyTemplate.Flags1                     = Convert.ToUInt32(values[index++]);
+                    if (values.Length < 2)
+                        values = line.Split(',');
 
-                m_currencyTemplate.Add(currencyTemplate.ID, currencyTemplate);
+                    if (values.Length < 16)
+                        continue;
+
+                    int index = 0;
+                    currencyTemplate.ID = Convert.ToUInt32(values[index++]);
+                    currencyTemplate.Name = values[index++];
+                    currencyTemplate.Description = values[index++];
+                    currencyTemplate.CategoryID = Convert.ToByte(values[index++]);
+                    currencyTemplate.InventoryIconFileDataID = Convert.ToUInt32(values[index++]);
+                    currencyTemplate.SpellWeight = Convert.ToUInt32(values[index++]);
+                    currencyTemplate.SpellCategory = Convert.ToByte(values[index++]);
+                    currencyTemplate.MaxQty = Convert.ToUInt32(values[index++]);
+                    currencyTemplate.MaxEarnablePerWeek = Convert.ToUInt32(values[index++]);
+                    currencyTemplate.Quality = Convert.ToByte(values[index++]);
+                    currencyTemplate.FactionID = Convert.ToUInt32(values[index++]);
+                    currencyTemplate.ItemGroupSoundsID = Convert.ToByte(values[index++]);
+                    currencyTemplate.XpQuestDifficulty = Convert.ToByte(values[index++]);
+                    currencyTemplate.AwardConditionID = Convert.ToUInt32(values[index++]);
+                    currencyTemplate.MaxQtyWorldStateID = Convert.ToUInt32(values[index++]);
+                    currencyTemplate.Flags0 = Convert.ToUInt32(values[index++]);
+                    currencyTemplate.Flags1 = Convert.ToUInt32(values[index++]);
+
+                    m_currencyTemplate.Add(currencyTemplate.ID, currencyTemplate);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
             }
         }
 

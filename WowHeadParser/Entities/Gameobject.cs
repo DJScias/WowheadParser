@@ -161,21 +161,20 @@ namespace WowHeadParser.Entities
 
                 foreach (String mode in modes)
                 {
-                    try
-                    {
-                        count = (float)Convert.ToDouble(gameobjectLootDatas[i].modes[mode]["count"]);
-                        outof = (float)Convert.ToDouble(gameobjectLootDatas[i].modes[mode]["outof"]);
-                        percent = count * 100 / outof;
-                    }
-                    catch (Exception) { }
+                    var m = gameobjectLootDatas[i].modes[mode];
+                    if (m == null || m["count"] == null || m["outof"] == null)
+                        continue;
+
+                    count = (float)Convert.ToDouble(m["count"]);
+                    outof = (float)Convert.ToDouble(gameobjectLootDatas[i].modes[mode]["outof"]);
+
+                    percent = count * 100 / outof;
                 }
 
                 GameObjectLootItemParsing currentItemParsing = null;
-                try
-                {
-                    currentItemParsing = (GameObjectLootItemParsing)gameobjectLootDatas[i];
-                }
-                catch (Exception) { }
+          
+                if (gameobjectLootDatas[i] is GameObjectLootItemParsing golip)
+                    currentItemParsing = golip;
 
                 gameobjectLootDatas[i].questRequired = currentItemParsing != null && currentItemParsing.classs == 12 ? "1": "0";
 
@@ -242,12 +241,10 @@ namespace WowHeadParser.Entities
                 foreach (GameObjectLootParsing gameobjectLootData in m_gameobjectLootDatas)
                 {
                     GameObjectLootCurrencyParsing currentLootCurrencyData = null;
-                    try
-                    {
-                        currentLootCurrencyData = (GameObjectLootCurrencyParsing)gameobjectLootData;
-                    }
-                    catch (Exception ex) { }
-
+          
+                    if (gameobjectLootData is GameObjectLootCurrencyParsing golip)
+                        currentLootCurrencyData = golip;
+    
                     int idMultiplier = currentLootCurrencyData != null ? -1 : 1;
 
                     if (idMultiplier < 1)

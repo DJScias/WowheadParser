@@ -158,6 +158,9 @@ namespace WowHeadParser.Entities
                         {
                             for (int i = 0; i < objectiveData.Count; i++)
                             {
+                                if (objectiveData[i]["id"] == null)
+                                    continue;
+
                                 int npcID = objectiveData[i]["id"].ToObject<int>();
 
                                 if (objectiveData[i]["point"] == "start" && !starterIDs.Contains(npcID))
@@ -239,7 +242,10 @@ namespace WowHeadParser.Entities
 
                 for (int i = questInSerieByStep.Count - 1; i >= 0; --i)
                 {
-                    String previousQuest = i > 0 ? questInSerieByStep[i - 1][0]: "";
+                    String previousQuest = "";
+
+                    if (questInSerieByStep.TryGetValue(i - 1, out var listStr) && listStr != null && listStr.Count != 0)
+                        previousQuest = i > 0 ? listStr[0]: "";
 
                     String exclusiveGroup = "0";
                     if (questInSerieByStep[i].Count > 1)

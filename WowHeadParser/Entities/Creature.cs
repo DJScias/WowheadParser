@@ -4,6 +4,7 @@
 using Newtonsoft.Json;
 using Sql;
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 using static WowHeadParser.MainWindow;
@@ -148,6 +149,10 @@ namespace WowHeadParser.Entities
                 return false;
             else if (m_creatureTemplateData.id == 0 && id != 0)
                 m_creatureTemplateData.id = id;
+
+
+            if (webClient == null)
+                webClient = new System.Net.Http.HttpClient();
 
             bool optionSelected = false;
             String creatureHtml = Tools.GetHtmlFromWowhead(GetWowheadUrl(), webClient);
@@ -322,18 +327,20 @@ namespace WowHeadParser.Entities
 
                     List<Int32> currencyId      = new List<Int32>();
                     List<Int32> currencyCount   = new List<Int32>();
+                    
+                    if (npcVendorDatas[i].cost.Count > 2)
+                        foreach (JArray itemCost in npcVendorDatas[i].cost[2])
+                        {
+                            itemId.Add(Convert.ToInt32(itemCost[0]));
+                            itemCount.Add(Convert.ToInt32(itemCost[1]));
+                        }
 
-                    foreach (JArray itemCost in npcVendorDatas[i].cost[2])
-                    {
-                        itemId.Add(Convert.ToInt32(itemCost[0]));
-                        itemCount.Add(Convert.ToInt32(itemCost[1]));
-                    }
-
-                    foreach (JArray currencyCost in npcVendorDatas[i].cost[1])
-                    {
-                        currencyId.Add(Convert.ToInt32(currencyCost[0]));
-                        currencyCount.Add(Convert.ToInt32(currencyCost[1]));
-                    }
+                    if (npcVendorDatas[i].cost.Count > 1)
+                        foreach (JArray currencyCost in npcVendorDatas[i].cost[1])
+                        {
+                            currencyId.Add(Convert.ToInt32(currencyCost[0]));
+                            currencyCount.Add(Convert.ToInt32(currencyCost[1]));
+                        }
 
                     npcVendorDatas[i].integerExtendedCost = (int)Tools.GetExtendedCostId(itemId, itemCount, currencyId, currencyCount);
                 }
@@ -352,10 +359,21 @@ namespace WowHeadParser.Entities
             List<CreatureLootParsing> lootsData = new List<CreatureLootParsing>();
 
             List<String> modes = new List<String>() { "4", "8", "16", "32", "64", "65536", "131072", "33554432" };
+            var arraySize = 0;
+            
+            if (creatureLootItemDatas != null)
+                arraySize += creatureLootItemDatas.Length;
 
-            CreatureLootParsing[] allLootData = new CreatureLootParsing[creatureLootItemDatas.Length + creatureLootCurrencyDatas.Length];
-            Array.Copy(creatureLootItemDatas, allLootData, creatureLootItemDatas.Length);
-            Array.Copy(creatureLootCurrencyDatas, 0, allLootData, creatureLootItemDatas.Length, creatureLootCurrencyDatas.Length);
+            if (creatureLootCurrencyDatas != null)
+                arraySize += creatureLootCurrencyDatas.Length;
+
+            CreatureLootParsing[] allLootData = new CreatureLootParsing[arraySize];
+
+            if (creatureLootItemDatas != null)
+                Array.Copy(creatureLootItemDatas, allLootData, creatureLootItemDatas.Length);
+
+            if (creatureLootCurrencyDatas != null)
+                Array.Copy(creatureLootCurrencyDatas, 0, allLootData, creatureLootItemDatas.Length, creatureLootCurrencyDatas.Length);
 
             for (uint i = 0; i < allLootData.Length; ++i)
             {
@@ -364,9 +382,8 @@ namespace WowHeadParser.Entities
                 float percent = 0.0f;
                 String currentMode = "";
 
-                try
+                if (allLootData[i].modes["mode"] is string realItemMode)
                 {
-                    String realItemMode = allLootData[i].modes["mode"];
                     String treatmentItemMode = realItemMode;
 
                     switch (realItemMode)
@@ -395,7 +412,7 @@ namespace WowHeadParser.Entities
 
                     currentMode = realItemMode;
                 }
-                catch (Exception e)
+                else
                 {
                     foreach (String mode in modes)
                     {
@@ -627,18 +644,16 @@ namespace WowHeadParser.Entities
                     List<int> entryList = new List<int>();
 
                     CreatureLootItemParsing creatureLootItemData = null;
-                    try
-                    {
-                        creatureLootItemData = (CreatureLootItemParsing)creatureLootData;
-                    }
-                    catch (Exception ex) { }
+       
+                    if (creatureLootData is CreatureLootItemParsing clip)
+                        creatureLootItemData = clip;
+                
 
                     CreatureLootCurrencyParsing creatureLootCurrencyData = null;
-                    try
-                    {
-                        creatureLootCurrencyData = (CreatureLootCurrencyParsing)creatureLootData;
-                    }
-                    catch (Exception ex) { }
+               
+                    if (creatureLootData is CreatureLootCurrencyParsing clcp)
+                        creatureLootCurrencyData = clcp;
+               
 
                     int minLootCount = creatureLootData.stack.Length >= 1 ? creatureLootData.stack[0] : 1;
                     int maxLootCount = creatureLootData.stack.Length >= 2 ? creatureLootData.stack[1] : minLootCount;
