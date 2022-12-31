@@ -204,16 +204,17 @@ namespace WowHeadParser.Entities
                 m_spellLootTemplateBuilder.SetFieldsNames("Item", "Reference", "Chance", "QuestRequired", "LootMode", "GroupId", "MinCount", "MaxCount", "Comment");
 
                 foreach (ItemCreateItemParsing itemLootData in m_itemCreateItemDatas)
-                    m_spellLootTemplateBuilder.AppendFieldsValue(m_itemSpellDatas[0].id, // Entry
-                                                                 itemLootData.id, // Item
-                                                                 0, // ReferenceitemLootData
-                                                                 "100", // Chance
-                                                                 0, // QuestRequired
-                                                                 1, // LootMode
-                                                                 0, // GroupId
-                                                                 "1", // MinCount
-                                                                 "1", // MaxCount
-                                                                 ""); // Comment
+                    if (m_itemSpellDatas != null && m_itemSpellDatas.Length > 0)
+                        m_spellLootTemplateBuilder.AppendFieldsValue(m_itemSpellDatas[0].id, // Entry
+                                                                     itemLootData.id, // Item
+                                                                     0, // ReferenceitemLootData
+                                                                     "100", // Chance
+                                                                     0, // QuestRequired
+                                                                     1, // LootMode
+                                                                     0, // GroupId
+                                                                     "1", // MinCount
+                                                                     "1", // MaxCount
+                                                                     ""); // Comment
 
                 returnSql += m_spellLootTemplateBuilder.ToString() + "\n";
             }
