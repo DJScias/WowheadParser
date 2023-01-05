@@ -12,7 +12,7 @@ namespace WowHeadParser
     class Range
     {
         static readonly object locker = new object();
-        const int MAX_WORKER = 20;
+        const int MAX_WORKER = 50;
 
         public Range(MainWindow view, String fileName, String optionName)
         {

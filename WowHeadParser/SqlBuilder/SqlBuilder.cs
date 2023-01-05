@@ -235,7 +235,12 @@ namespace Sql
                         continue;
 
                     tableNames.AppendFormat(NumberFormatInfo.InvariantInfo, "{0}, ", _fields[j]);
-                    tableValues.AppendFormat(NumberFormatInfo.InvariantInfo, "'{0}', ", item[j].Replace("'", "''"));
+                    var val = item[j];
+
+                    if (!string.IsNullOrEmpty(val) && val.Contains("'"))
+                        val = val.Replace("'", "''");
+                    
+                    tableValues.AppendFormat(NumberFormatInfo.InvariantInfo, "'{0}', ", val);
                     tableUpdates.AppendFormat(NumberFormatInfo.InvariantInfo, "{0} = VALUES({1}), ", _fields[j], _fields[j]);
                     notEmpty = true;
                 }

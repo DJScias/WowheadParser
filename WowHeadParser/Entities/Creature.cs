@@ -9,6 +9,8 @@ using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 using static WowHeadParser.MainWindow;
 using System.Windows.Forms;
+using WowHeadParser.Models;
+using static WowHeadParser.Entities.Gameobject;
 
 namespace WowHeadParser.Entities
 {
@@ -62,12 +64,12 @@ namespace WowHeadParser.Entities
     class CreatureLootParsing
     {
         public int id;
-        public dynamic modes;
         public int[] stack;
 
         public string percent;
         public string questRequired;
-        public string mode;
+        public Modes ModesObj;
+        public string name = "";
     }
 
     class CreatureLootItemParsing : CreatureLootParsing
@@ -211,8 +213,8 @@ namespace WowHeadParser.Entities
                 String creatureLootCurrencyJSon = Tools.ExtractJsonFromWithPattern(creatureHtml, creatureCurrencyPattern, 1);
                 if (creatureLootJSon != null || creatureLootCurrencyJSon != null)
                 {
-                    CreatureLootItemParsing[] creatureLootDatas = creatureLootJSon != null ? JsonConvert.DeserializeObject<CreatureLootItemParsing[]>(creatureLootJSon) : new CreatureLootItemParsing[0];
-                    CreatureLootCurrencyParsing[] creatureLootCurrencyDatas = creatureLootCurrencyJSon != null ? JsonConvert.DeserializeObject<CreatureLootCurrencyParsing[]>(creatureLootCurrencyJSon) : new CreatureLootCurrencyParsing[0];
+                    CreatureDrop[] creatureLootDatas = creatureLootJSon != null ? JsonConvert.DeserializeObject<CreatureDrop[]>(creatureLootJSon, Converter.SettingsDropConverter) : new CreatureDrop[0];
+                    ObjectContainsCurrency[] creatureLootCurrencyDatas = creatureLootCurrencyJSon != null ? JsonConvert.DeserializeObject<ObjectContainsCurrency[]>(creatureLootCurrencyJSon, Converter.SettingsDropConverter) : new ObjectContainsCurrency[0];
 
                     SetCreatureLootData(creatureLootDatas, creatureLootCurrencyDatas);
                     optionSelected = true;
@@ -354,107 +356,34 @@ namespace WowHeadParser.Entities
             m_npcVendorDatas = npcVendorDatas;
         }
 
-        public void SetCreatureLootData(CreatureLootItemParsing[] creatureLootItemDatas, CreatureLootCurrencyParsing[] creatureLootCurrencyDatas)
+        public void SetCreatureLootData(CreatureDrop[] creatureLootItemDatas, ObjectContainsCurrency[] creatureLootCurrencyDatas)
         {
             List<CreatureLootParsing> lootsData = new List<CreatureLootParsing>();
 
-            List<String> modes = new List<String>() { "4", "8", "16", "32", "64", "65536", "131072", "33554432" };
-            var arraySize = 0;
-            
-            if (creatureLootItemDatas != null)
-                arraySize += creatureLootItemDatas.Length;
-
-            if (creatureLootCurrencyDatas != null)
-                arraySize += creatureLootCurrencyDatas.Length;
-
-            CreatureLootParsing[] allLootData = new CreatureLootParsing[arraySize];
-
-            if (creatureLootItemDatas != null)
-                Array.Copy(creatureLootItemDatas, allLootData, creatureLootItemDatas.Length);
-
-            if (creatureLootCurrencyDatas != null)
-                Array.Copy(creatureLootCurrencyDatas, 0, allLootData, creatureLootItemDatas.Length, creatureLootCurrencyDatas.Length);
-
-            for (uint i = 0; i < allLootData.Length; ++i)
+            foreach (CreatureDrop gameobjectLootItemData in creatureLootItemDatas)
             {
-                float count = 0.0f;
-                float outof = 0.0f;
-                float percent = 0.0f;
-                String currentMode = "";
-
-                if (allLootData[i].modes["mode"] is string realItemMode)
+                lootsData.Add(new CreatureLootItemParsing()
                 {
-                    String treatmentItemMode = realItemMode;
+                    id = gameobjectLootItemData.id,
+                    questRequired = gameobjectLootItemData.classs == 12 ? "1" : "0",
+                    stack = gameobjectLootItemData.stack,
+                    ModesObj = gameobjectLootItemData.modes,
+                    name = gameobjectLootItemData.name,
+                    bonustrees = gameobjectLootItemData.bonustrees,
+                    classs = gameobjectLootItemData.classs,
+                    count = gameobjectLootItemData.count
+                });
+            }
 
-                    switch (realItemMode)
-                    {
-                        case "24":
-                            treatmentItemMode = "8";
-                            break;
-                        case "33554433":
-                        case "33554434":
-                            treatmentItemMode = "4";
-                            break;
-                    }
-
-                    count = (float)Convert.ToDouble(allLootData[i].modes[treatmentItemMode]["count"]);
-                    outof = (float)Convert.ToDouble(allLootData[i].modes[treatmentItemMode]["outof"]);
-
-                    if (count == -1 || count > outof)
-                        percent = 0;
-                    else
-                        percent = count * 100 / outof;
-
-                    /* Zero percentage items should be handled with a warning, hence commented out
-                    if (count < 25 && percent < 0.05f)
-                        continue;
-                    */
-
-                    currentMode = realItemMode;
-                }
-                else
+            foreach (ObjectContainsCurrency gameobjectLootItemData in creatureLootCurrencyDatas)
+            {
+                lootsData.Add(new CreatureLootParsing()
                 {
-                    foreach (String mode in modes)
-                    {
-                        try
-                        {
-                            count = (float)Convert.ToDouble(allLootData[i].modes["0"]["count"]) != -1 ? (float)Convert.ToDouble(allLootData[i].modes["0"]["count"]) : 0.0f;
-                            outof = (float)Convert.ToDouble(allLootData[i].modes["0"]["outof"]);
-                            if (count != 0.0f)
-                                percent = count * 100 / outof;
-                            else
-                                percent = 0.0f;
-
-                            /* Zero percentage items should be handled with a warning, hence commented out
-                            if (count < 25 && percent < 0.05f)
-                                continue;
-                            */
-
-                            currentMode = mode;
-                            break;
-                        }
-                        catch (Exception)
-                        {
-                        }
-                    }
-                }
-
-                if (currentMode == "")
-                {
-                    continue;
-                }
-
-                CreatureLootItemParsing currentItemParsing = null;
-                try
-                {
-                    currentItemParsing = (CreatureLootItemParsing)allLootData[i];
-                }
-                catch (Exception ex) { }
-
-                allLootData[i].questRequired = (currentItemParsing != null && currentItemParsing.classs == 12) ? "1" : "0";
-                allLootData[i].percent = Tools.NormalizeFloat(percent);
-                allLootData[i].mode = currentMode;
-                lootsData.Add(allLootData[i]);
+                    id = gameobjectLootItemData.id,
+                    questRequired =  "0",
+                    stack = gameobjectLootItemData.stack,
+                    ModesObj = gameobjectLootItemData.modes
+                });
             }
 
             m_creatureLootDatas = lootsData.ToArray();
@@ -658,10 +587,18 @@ namespace WowHeadParser.Entities
                     int minLootCount = creatureLootData.stack.Length >= 1 ? creatureLootData.stack[0] : 1;
                     int maxLootCount = creatureLootData.stack.Length >= 2 ? creatureLootData.stack[1] : minLootCount;
 
+                    int lootMode = 1;
+                    int lootMask = 1;
+                    foreach (var modeId in creatureLootData.ModesObj.mode)
+                    {
+                        lootMode = lootMode * 2;
+                        lootMask |= lootMode;
+                    }
+
                     // If bonuses, certainly an important loot, set to references
                     if (!IsCheckboxChecked("is dungeon/raid boss") || (creatureLootItemData == null || creatureLootItemData.bonustrees == null))
                     {
-                        switch (creatureLootData.mode)
+                        switch (creatureLootData.ModesObj.mode)
                         {
                             default:
                                 entryList.Add(templateEntry);
@@ -678,13 +615,13 @@ namespace WowHeadParser.Entities
                             m_creatureLootBuilder.AppendFieldsValue(entry, // Entry
                                                                     creatureLootData.id * idMultiplier, // Item
                                                                     0, // Reference
-                                                                    creatureLootData.percent, // Chance
+                                                                    Tools.NormalizeFloat(creatureLootData.ModesObj.ModeMap.FirstOrDefault().Value.Percent), // Chance
                                                                     creatureLootData.questRequired, // QuestRequired
-                                                                    1, // LootMode
+                                                                    lootMask, // LootMode
                                                                     0, // GroupId
                                                                     minLootCount, // MinCount
                                                                     maxLootCount, // MaxCount
-                                                                    ""); // Comment
+                                                                    creatureLootData.name?.Replace("'", "\\'")); // Comment
                         }
                     }
                     else
@@ -694,26 +631,26 @@ namespace WowHeadParser.Entities
                             m_creatureLootBuilder.AppendFieldsValue(templateEntry, // Entry
                                                                     0, // Item
                                                                     templateEntry, // Reference
-                                                                    100, // Chance
+                                                                    Tools.NormalizeFloat(creatureLootData.ModesObj.ModeMap.FirstOrDefault().Value.Percent), // Chance
                                                                     0, // QuestRequired
-                                                                    1, // LootMode
+                                                                    lootMask, // LootMode
                                                                     0, // GroupId
                                                                     maxReferenceLoot, // MinCount
                                                                     maxReferenceLoot, // MaxCount
-                                                                    ""); // Comment
+                                                                    creatureLootData.name?.Replace("'", "\\'")); // Comment
                             referenceAdded = true;
                         }
 
                         m_creatureReferenceLootBuilder.AppendFieldsValue(templateEntry, // Entry
                                                                          creatureLootData.id, // Item
                                                                          0, // Reference
-                                                                         creatureLootData.percent, // Chance
+                                                                         Tools.NormalizeFloat(creatureLootData.ModesObj.ModeMap.FirstOrDefault().Value.Percent), // Chance
                                                                          creatureLootData.questRequired, // QuestRequired
-                                                                         1, // LootMode
+                                                                         lootMask, // LootMode
                                                                          1, // GroupId
                                                                          minLootCount, // MinCount
                                                                          maxLootCount, // MaxCount
-                                                                         ""); // Comment
+                                                                         creatureLootData.name?.Replace("'", "\\'")); // Comment
                     }
 
                     if (creatureLootData.percent == "0")

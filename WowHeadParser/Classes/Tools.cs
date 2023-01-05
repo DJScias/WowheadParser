@@ -281,7 +281,13 @@ namespace WowHeadParser
             if (Math.Round(value) == 0 && value != 0)
                 returnFloat = value;
 
-            return returnFloat.ToString("F99").TrimEnd("0".ToCharArray()).Replace(",", ".").TrimEnd(".".ToCharArray());
+
+            var retVal = returnFloat.ToString("F99").TrimEnd("0".ToCharArray()).Replace(",", ".").TrimEnd(".".ToCharArray());
+            
+            if (retVal == "-∞")
+                retVal = "100";
+
+            return retVal;
         }
 
         public static Int32 GetUnixTimestamp()

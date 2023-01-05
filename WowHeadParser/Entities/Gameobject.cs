@@ -5,6 +5,8 @@ using Newtonsoft.Json;
 using Sql;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using WowHeadParser.Models;
 using static WowHeadParser.MainWindow;
 
 namespace WowHeadParser.Entities
@@ -26,6 +28,8 @@ namespace WowHeadParser.Entities
 
             public string percent;
             public string questRequired;
+            public Modes ModesObj;
+            public string name;
         }
 
         public class GameObjectLootItemParsing : GameObjectLootParsing
@@ -104,8 +108,8 @@ namespace WowHeadParser.Entities
                 String gameobjectLootCurrencyJSon = Tools.ExtractJsonFromWithPattern(gameobjectHtml, gameobjectLootCurrencyPattern);
                 if (gameobjectLootItemJSon != null || gameobjectLootCurrencyJSon != null)
                 {
-                    GameObjectLootItemParsing[] gameobjectLootItemDatas = gameobjectLootItemJSon != null ? JsonConvert.DeserializeObject<GameObjectLootItemParsing[]>(gameobjectLootItemJSon) : new GameObjectLootItemParsing[0];
-                    GameObjectLootCurrencyParsing[] gameobjectLootCurrencyDatas = gameobjectLootCurrencyJSon != null ? JsonConvert.DeserializeObject<GameObjectLootCurrencyParsing[]>(gameobjectLootCurrencyJSon) : new GameObjectLootCurrencyParsing[0];
+                    ObjectContains[] gameobjectLootItemDatas = gameobjectLootItemJSon != null ? JsonConvert.DeserializeObject<ObjectContains[]>(gameobjectLootItemJSon, Converter.SettingsDropConverter) : new ObjectContains[0];
+                    ObjectContainsCurrency[] gameobjectLootCurrencyDatas = gameobjectLootCurrencyJSon != null ? JsonConvert.DeserializeObject<ObjectContainsCurrency[]>(gameobjectLootCurrencyJSon) : new ObjectContainsCurrency[0];
                     SetGameobjectLootData(gameobjectLootItemDatas, gameobjectLootCurrencyDatas);
                     optionSelected = true;
                 }
@@ -145,47 +149,36 @@ namespace WowHeadParser.Entities
                 return false;
         }
 
-        public void SetGameobjectLootData(GameObjectLootItemParsing[] gameobjectLootItemDatas, GameObjectLootCurrencyParsing[] gameobjectLootCurrencyDatas)
+        public void SetGameobjectLootData(ObjectContains[] gameobjectLootItemDatas, ObjectContainsCurrency[] gameobjectLootCurrencyDatas)
         {
-            GameObjectLootParsing[] gameobjectLootDatas = new GameObjectLootParsing[gameobjectLootItemDatas.Length + gameobjectLootCurrencyDatas.Length];
-            Array.Copy(gameobjectLootItemDatas, gameobjectLootDatas, gameobjectLootItemDatas.Length);
-            Array.Copy(gameobjectLootCurrencyDatas, 0, gameobjectLootDatas, gameobjectLootItemDatas.Length, gameobjectLootCurrencyDatas.Length);
-
-            List<String> modes = new List<String>() { "1", "2", "4", "33554432" };
-
-            for (uint i = 0; i < gameobjectLootDatas.Length; ++i)
+            var deltaList = new List<GameObjectLootParsing>();
+            foreach (ObjectContains gameobjectLootItemData in gameobjectLootItemDatas)
             {
-                float count = 0.0f;
-                float outof = 0.0f;
-                float percent = 0.0f;
-
-                foreach (String mode in modes)
+                deltaList.Add(new GameObjectLootParsing()
                 {
-                    var m = gameobjectLootDatas[i].modes[mode];
-                    if (m == null || m["count"] == null || m["outof"] == null)
-                        continue;
-
-                    count = (float)Convert.ToDouble(m["count"]);
-                    outof = (float)Convert.ToDouble(gameobjectLootDatas[i].modes[mode]["outof"]);
-
-                    percent = count * 100 / outof;
-                }
-
-                GameObjectLootItemParsing currentItemParsing = null;
-          
-                if (gameobjectLootDatas[i] is GameObjectLootItemParsing golip)
-                    currentItemParsing = golip;
-
-                gameobjectLootDatas[i].questRequired = currentItemParsing != null && currentItemParsing.classs == 12 ? "1": "0";
-
-                // Normalize
-                if (percent > 99.0f)
-                    percent = 100.0f;
-
-                gameobjectLootDatas[i].percent = Tools.NormalizeFloat(percent);
+                    count = gameobjectLootItemData.count,
+                    id = gameobjectLootItemData.id,
+                    questRequired = gameobjectLootItemData.classs == 12 ? "1" : "0",
+                    stack = gameobjectLootItemData.stack,
+                    ModesObj = gameobjectLootItemData.modes,
+                    name = gameobjectLootItemData.name,
+                });
             }
 
-            m_gameobjectLootDatas = gameobjectLootDatas;
+            foreach (ObjectContainsCurrency gameobjectLootItemData in gameobjectLootCurrencyDatas)
+            {
+
+                deltaList.Add(new GameObjectLootParsing()
+                {
+                    count = gameobjectLootItemData.count,
+                    id = gameobjectLootItemData.id,
+                    questRequired = "0",
+                    stack = gameobjectLootItemData.stack,
+                    ModesObj = gameobjectLootItemData.modes
+                });
+            }
+
+            m_gameobjectLootDatas = deltaList.ToArray();
         }
 
         public void SetGameobjectHerbalismOrMiningData(GameObjectLootParsing[] gameobjectHerbalismOrMiningDatas, int totalCount, bool herbalism)
@@ -252,18 +245,32 @@ namespace WowHeadParser.Entities
 
                     int minLootCount = gameobjectLootData.stack.Length >= 1 ? gameobjectLootData.stack[0] : 1;
                     int maxLootCount = gameobjectLootData.stack.Length >= 2 ? gameobjectLootData.stack[1] : minLootCount;
+                    if (gameobjectLootData.ModesObj.ModeMap == null)
+                        continue;
 
+                    int lootMode = 1;
+                    int lootMask = 1;
+                    foreach (var modeId in gameobjectLootData.ModesObj.mode)
+                    {
+                        lootMode = lootMode * 2;
+                        lootMask |= lootMode;
+                    }
 
-                    m_gameobjectLootBuilder.AppendFieldsValue(  m_data.id, // Entry
-                                                                gameobjectLootData.id * idMultiplier, // Item
-                                                                0, // Reference
-                                                                gameobjectLootData.percent, // Chance
-                                                                gameobjectLootData.questRequired, // QuestRequired
-                                                                1, // LootMode
-                                                                0, // GroupId
-                                                                minLootCount, // MinCount
-                                                                maxLootCount, // MaxCount
-                                                                ""); // Comment
+                    if (gameobjectLootData.ModesObj.ModeMap.TryGetValue("0", out var mode))
+                        m_gameobjectLootBuilder.AppendFieldsValue(m_data.id, // Entry
+                                                                    gameobjectLootData.id * idMultiplier, // Item
+                                                                    0, // Reference
+                                                                    Tools.NormalizeFloat(mode.Percent), // Chance
+                                                                    gameobjectLootData.questRequired, // QuestRequired
+                                                                    lootMask, // LootMode
+                                                                    0, // GroupId
+                                                                    minLootCount, // MinCount
+                                                                    maxLootCount, // MaxCount
+                                                                    gameobjectLootData.name.Replace("'", "\\'")); // Comment
+                   
+                    
+
+                    
                 }
 
                 returnSql += m_gameobjectLootBuilder.ToString() + "\n";
